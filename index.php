@@ -14,11 +14,17 @@ if((!isset($_GET['if'])) or (isset($_GET['if']) and ($_GET['if'] == ""))) //jesl
 <form action="index.php" method="get">
 Podaj znak interfejsu: <input type="text" name="if">
 <input type="submit" value="OK">
+<br>"APRSIS" nie jest poprawnym adresem interfejsu i wyswietlone dane nie będą zgodne z rzeczywistością. Wpisz cokolwiek innego.
 </form>
 <?php
 } else
 {
-	$znak = $_GET['if'];
+	$znak = strtoupper($_GET['if']);
+	$znakraw = $znak;
+	while(strlen($znakraw) < 9)
+	{
+		$znakraw .= " ";
+	}
 	$ileis = $ilerx = $iletx = $ileinnych = 0;
 	$czas1 = 0;
 	$czas2 = 0;
@@ -40,7 +46,8 @@ function stacjaparse($ramka)
 	global $znak;
 	global $stacjeposr;
 	global $stacjebezposr;
-	if(strpos($ramka, $znak."  R")) //czy to jest ramka odebrana po radiu?
+	global $znakraw;
+	if(strpos($ramka, $znakraw." R")) //czy to jest ramka odebrana po radiu?
 	{
 		//czesc dla liczenia ilosci ramek od stacji
 		$aa = explode(">", $ramka); //odetnij wszystko za znakiem
@@ -118,7 +125,8 @@ function stacjaparse($ramka)
 			}
 		} else //a jesli nie ma gwiazdki
 		{
-			if($sppos = strpos($cc, "SP") !== false) //jesli jest tam SP, to moze to mimo wszystko byc powtorzone przez digi
+			$sppos = strpos($cc, "SP");
+			if((strpos($cc, "SP") !== false) and ($cc[$sppos + 3] == "-")) //jesli jest tam SP, to moze to mimo wszystko byc powtorzone przez digi
 			{
 				if($cc[$sppos + 2] == $cc[$sppos + 4]) //jesli jest tam np. SP4-4 (czyli 2 takie same cyfry)
 				{
@@ -175,12 +183,12 @@ $liniiwpliku = count($plik);
 while ($ilelinii < $liniiwpliku) { //czytaj linia po linii
     $linia = $plik[$ilelinii];
 	stacjaparse($linia);
-	if(strpos($linia, $znak."  R") !== false) { //jesli to ramka odebrana przez siec radiowa
+	if(strpos($linia, $znakraw." R") !== false) { //jesli to ramka odebrana przez siec radiowa
 		$ilerx++;
-	} elseif(strpos($linia, "APRSIS") !== false) //a jesli z APRSIS
+	} elseif(strpos($linia, "APRSIS    R") !== false) //a jesli z APRSIS
 	{
 		$ileis++;
-	} elseif(strpos($linia, $znak."  T") !== false) //jesli to sa ramki nadane na radio
+	} elseif(strpos($linia, $znakraw." T") !== false) //jesli to sa ramki nadane na radio
 	{
 		$iletx++;
 	} else //inne ramki
@@ -203,6 +211,10 @@ echo "<br><br><b>Pokaż:</b> <a href=\"index.php?if=$znak&dane=ilosc\">Odebrane 
 if(!isset($_GET['dane']) or (isset($_GET['dane']) and $_GET['dane'] === "ilosc")) //jesli mamy pokazac ile jest stacji
 {
 	$unikalne = array_count_values($stacjeodebrane); //ilosc wystapien kazdej z wartosci, ale uzyjemy tego tylko dla stacji unikalnych
+	if(empty($unikalne))
+	{
+		$unikalne[1] = 0;
+	}
 	echo "<br><br><b>Stacje odebrane drogą radiową (w tym $unikalne[1] unikalnych):</b><br>";
 	echo "<br><pre><font color=\"blue\"><b>Znak\t&nbsp;&nbsp;&nbsp;&nbsp;Punkty</b></font><br>";
 	array_multisort($stacjeodebrane, SORT_DESC); //sortujemy malejaco
