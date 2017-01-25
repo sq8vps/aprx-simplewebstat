@@ -22,7 +22,7 @@ Podaj znak interfejsu: <input type="text" name="if">
 	$ileis = $ilerx = $iletx = $ileinnych = 0;
 	$czas1 = 0;
 	$czas2 = 0;
-	$ramkinamin = 0.00;
+	$ramkinamin = 0;
 ?>
 
 <center><font size="20"><b>Statystyki APRX</b></font>
@@ -34,9 +34,13 @@ Podaj znak interfejsu: <input type="text" name="if">
 function stacjaparse($ramka)
 {
 	global $stacjeodebrane;
+	global $stacjestale;
+	global $stacjeruchome;
+	global $stacjeinne;
 	global $znak;
 	if(strpos($ramka, $znak."  R")) //czy to jest ramka odebrana po radiu?
 	{
+		//czesc dla liczenia ilosci ramek od stacji
 		$aa = explode(">", $ramka); //odetnij wszystko za znakiem
 		$znakstacji = substr($aa[0], 36); //obetnij linie do miejsca, gdzie jest znak TODO: chyba nie zawsze działa, bo nie zawsze 36
 		if(array_key_exists($znakstacji, $stacjeodebrane)) //jesli ten znak juz jest na liscie stacji
@@ -46,7 +50,63 @@ function stacjaparse($ramka)
 		{
 			$stacjeodebrane[$znakstacji] = 1; //dodajemy go do listy
 		}
+		//czesc dla podzialu na stacje ruchome i stale
+		$bb = substr($ramka, 46); //na poczatek musimy uciac kawalek ramki z poczarku, zeby nie wystapil wczesniej dwukropek
+		$bb = substr($bb, strpos($bb, ":") + 1); //bierzemy cala czesc ramki za znakiem ':' czyli separatorem sciezki od pola informacji
+		if(($bb[0] === "@") or ($bb[0] === "!") or ($bb[0] === "=") or ($bb[0] === "/")) //jesli to jest ramka z pozycja
+		{
+			if($bb[7] === 'z')
+			{
+				if(in_array($bb[26], array('!', '#', '%', '&', '+', ',', '-', '.', '/', ':', ';', '?', '@', 'A', 'B', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'T', 'V', 'W', 'Z', '\\', ']', '_', '`', 'c', 'd', 'h', 'i', 'l', 'm', 'n', 'o', 'q', 'r', 't', 'w', 'x', 'y', 'z', '}')))
+				{
+					if(!in_array($znakstacji, $stacjestale))
+					{
+						$stacjestale[] = $znakstacji;
+					}
+				}	
+				elseif(in_array($bb[26], array('\$', '\'', '(', ')', '*', '<', '=', '>', 'C', 'F', 'P', 'R', 'U', 'X', 'Y', '[', '^', 'a', 'b', 'f', 'g', 'j', 'k', 'p', 's', 'u', 'v')))
+				{
+					if(!in_array($znakstacji, $stacjeruchome))
+					{
+						$stacjeruchome[] = $znakstacji;
+					}
+				}
+				else
+				{
+					if(!in_array($znakstacji, $stacjeinne))
+					{
+						$stacjeinne[] = $znakstacji;
+					}
+				}	
+			} else
+			{
+				if(in_array($bb[19], array('!', '#', '%', '&', '+', ',', '-', '.', '/', ':', ';', '?', '@', 'A', 'B', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'T', 'V', 'W', 'Z', '\\', ']', '_', '`', 'c', 'd', 'h', 'i', 'l', 'm', 'n', 'o', 'q', 'r', 't', 'w', 'x', 'y', 'z', '}')))
+				{
+					if(!in_array($znakstacji, $stacjestale))
+					{
+						$stacjestale[] = $znakstacji;
+					}
+				}	
+				elseif(in_array($bb[19], array('\$', '\'', '(', ')', '*', '<', '=', '>', 'C', 'F', 'P', 'R', 'U', 'X', 'Y', '[', '^', 'a', 'b', 'f', 'g', 'j', 'k', 'p', 's', 'u', 'v')))
+				{
+					if(!in_array($znakstacji, $stacjeruchome))
+					{
+						$stacjeruchome[] = $znakstacji;
+					}
+				
+				}
+				else
+				{
+					if(!in_array($znakstacji, $stacjeinne))
+					{
+						$stacjeinne[] = $znakstacji;
+					}
+				
+				}
+			}
+		}
 	}
+	
 } 
 
 function obciazenie($ramka, $koniec)
@@ -64,8 +124,11 @@ function obciazenie($ramka, $koniec)
 	}
 	
 }
-$adrespliku = "/var/log/aprx/test.log";
+$adrespliku = "/var/log/aprx/aprx-rf.log";
 $stacjeodebrane = array();
+$stacjestale = array();
+$stacjeruchome = array();
+$stacjeinne = array();
 $ilelinii = 0;
 $plik = array();
 
@@ -98,22 +161,45 @@ if($plik[$ilelinii - 20] > 0)
 	obciazenie($plik[$ilelinii - 1], 1);
 	echo "<br><b>Obciążenie (ostatnie 20 ramek): </b>".number_format($ramkinamin, 2, '.', ',')." ramek/min";
 }
-$unikalne = array_count_values($stacjeodebrane); //ilosc wystapien kazdej z wartosci, ale uzyjemy tego tylko dla stacji unikalnych
-echo "<br><br><b>Stacje odebrane drogą radiową (w tym $unikalne[1] unikalnych):</b><br><br>";
-echo "<pre><font color=\"blue\"><b>Znak\t&nbsp;&nbsp;&nbsp;&nbsp;Punkty</b></font><br>";
-array_multisort($stacjeodebrane, SORT_DESC); //sortujemy malejaco
-while(list($z, $il) = each($stacjeodebrane))
+echo "<br><a href=\"index.php?if=$znak&dane=ilosc\">Odebrane stacje</a> <a href=\"index.php?if=$znak&dane=rs\">Stacje ruchome i stałe</a>";
+if(!isset($_GET['dane']) or (isset($_GET['dane']) and $_GET['dane'] === "ilosc")) //jesli mamy pokazac ile jest stacji
 {
-	echo $z; //znak 
-	$spacje = 12 - strlen($z); //sprawdzamy ile musimy miec spacji, aby wszystko bylo rowno
-	for($i = 0; $i < $spacje; $i++) //i dodajemy te spacje
+	$unikalne = array_count_values($stacjeodebrane); //ilosc wystapien kazdej z wartosci, ale uzyjemy tego tylko dla stacji unikalnych
+	echo "<br><br><b>Stacje odebrane drogą radiową (w tym $unikalne[1] unikalnych):</b><br>";
+	echo "<br><pre><font color=\"blue\"><b>Znak\t&nbsp;&nbsp;&nbsp;&nbsp;Punkty</b></font><br>";
+	array_multisort($stacjeodebrane, SORT_DESC); //sortujemy malejaco
+	while(list($z, $il) = each($stacjeodebrane))
 	{
-		echo '&nbsp;';
+		echo $z; //znak 
+		$spacje = 12 - strlen($z); //sprawdzamy ile musimy miec spacji, aby wszystko bylo rowno
+		for($i = 0; $i < $spacje; $i++) //i dodajemy te spacje
+		{
+			echo '&nbsp;';
+		}
+		echo $il; //ile razy znak byl uslyszany
+		echo '<br>';
 	}
-	echo $il; //ile razy znak byl uslyszany
-	echo '<br>';
+} elseif(isset($_GET['dane']) and $_GET['dane'] === "rs") //a jesli mamy pokazac czy to stacje ruchome czy stale
+{
+	asort($stacjeruchome); //sortujemy alfabetycznie
+	asort($stacjestale);
+	asort($stacjeinne);
+	echo "<br><br><b>Stacje ruchome (".count($stacjeruchome)."):</b> ";
+	while(list($u, $o) = each($stacjeruchome))
+	{
+		echo $o.", ";
+	}
+	echo "<br><br><b>Stacje stałe (".count($stacjestale)."):</b> ";
+	while(list($u, $o) = each($stacjestale))
+	{
+		echo $o.", ";
+	}
+	echo "<br><br><b>Stacje inne (".count($stacjeinne)."):</b> ";
+	while(list($u, $o) = each($stacjeinne))
+	{
+		echo $o.", ";
+	}		
 }
-
 
 ?>
 
