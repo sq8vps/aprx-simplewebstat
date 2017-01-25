@@ -4,7 +4,7 @@
 <meta name="Description" content="Statystyki APRX" />
 <meta name="Keywords" content="" />
 <meta name="Author" content="SQ8VPS" />
-<title>Statyski APRX</title>
+<title>Statystyki APRX</title>
 </head>
 <body>
 <?php
@@ -38,6 +38,8 @@ function stacjaparse($ramka)
 	global $stacjeruchome;
 	global $stacjeinne;
 	global $znak;
+	global $stacjeposr;
+	global $stacjebezposr;
 	if(strpos($ramka, $znak."  R")) //czy to jest ramka odebrana po radiu?
 	{
 		//czesc dla liczenia ilosci ramek od stacji
@@ -105,6 +107,40 @@ function stacjaparse($ramka)
 				}
 			}
 		}
+		//czesc dla podzialu na stacje uslyszane posrednio i bezposrednio
+		$cc = substr($ramka, strpos($ramka, ">")); //ucinamy na wszelki wypadek
+		$cc = substr($cc, 0, strpos($cc, ":")); //bierzemy cala czesc ramki przed znakiem ':' czyli separatorem sciezki od pola informacji
+		if(strpos($cc, '*') !== false) //jesli mamy gwiazdke, to ta ramka na pewno nie jest bezposrednio
+		{
+			if(!in_array($znakstacji, $stacjeposr))
+			{
+				$stacjeposr[] = $znakstacji;
+			}
+		} else //a jesli nie ma gwiazdki
+		{
+			if($sppos = strpos($cc, "SP") !== false) //jesli jest tam SP, to moze to mimo wszystko byc powtorzone przez digi
+			{
+				if($cc[$sppos + 2] == $cc[$sppos + 4]) //jesli jest tam np. SP4-4 (czyli 2 takie same cyfry)
+				{
+					if(!in_array($znakstacji, $stacjebezposr))
+					{
+						$stacjebezposr[] = $znakstacji;
+					}
+				} else //a jesli jest tam np. SP3-2 to ramka jest powtorzona
+				{
+					if(!in_array($znakstacji, $stacjeposr))
+					{
+							$stacjeposr[] = $znakstacji;
+					}
+				}
+			} else //a jesli nie ma SP, to na pewno jest bezposrednio
+			{
+				if(!in_array($znakstacji, $stacjebezposr))
+				{
+					$stacjebezposr[] = $znakstacji;
+				}
+			}
+		}
 	}
 	
 } 
@@ -129,6 +165,8 @@ $stacjeodebrane = array();
 $stacjestale = array();
 $stacjeruchome = array();
 $stacjeinne = array();
+$stacjeposr = array();
+$stacjebezposr = array();
 $ilelinii = 0;
 $plik = array();
 
@@ -161,7 +199,7 @@ if($plik[$ilelinii - 20] > 0)
 	obciazenie($plik[$ilelinii - 1], 1);
 	echo "<br><b>Obciążenie (ostatnie 20 ramek): </b>".number_format($ramkinamin, 2, '.', ',')." ramek/min";
 }
-echo "<br><a href=\"index.php?if=$znak&dane=ilosc\">Odebrane stacje</a> <a href=\"index.php?if=$znak&dane=rs\">Stacje ruchome i stałe</a>";
+echo "<br><br><b>Pokaż:</b> <a href=\"index.php?if=$znak&dane=ilosc\">Odebrane stacje</a> - <a href=\"index.php?if=$znak&dane=rs\">Stacje ruchome i stałe</a>";
 if(!isset($_GET['dane']) or (isset($_GET['dane']) and $_GET['dane'] === "ilosc")) //jesli mamy pokazac ile jest stacji
 {
 	$unikalne = array_count_values($stacjeodebrane); //ilosc wystapien kazdej z wartosci, ale uzyjemy tego tylko dla stacji unikalnych
@@ -184,21 +222,35 @@ if(!isset($_GET['dane']) or (isset($_GET['dane']) and $_GET['dane'] === "ilosc")
 	asort($stacjeruchome); //sortujemy alfabetycznie
 	asort($stacjestale);
 	asort($stacjeinne);
-	echo "<br><br><b>Stacje ruchome (".count($stacjeruchome)."):</b> ";
+	echo "<br><br><hr /><br><font color=\"blue\"><b>Stacje ruchome (<u>".count($stacjeruchome)."</u>):</b></font> ";
 	while(list($u, $o) = each($stacjeruchome))
 	{
 		echo $o.", ";
 	}
-	echo "<br><br><b>Stacje stałe (".count($stacjestale)."):</b> ";
+	echo "<br><br><font color=\"red\"><b>Stacje stałe (<u>".count($stacjestale)."</u>):</b></font> ";
 	while(list($u, $o) = each($stacjestale))
 	{
 		echo $o.", ";
 	}
-	echo "<br><br><b>Stacje inne (".count($stacjeinne)."):</b> ";
+	echo "<br><br><font color=\"green\"><b>Stacje inne (<u>".count($stacjeinne)."</u>):</b></font> ";
 	while(list($u, $o) = each($stacjeinne))
 	{
 		echo $o.", ";
-	}		
+	}
+	
+	
+	asort($stacjeposr); //sortujemy alfabetycznie
+	asort($stacjebezposr);
+	echo "<br><br><hr /><br><font color=\"blue\"><b>Stacje odebrane pośrednio (przez digi) (<u>".count($stacjeposr)."</u>):</b></font> ";
+	while(list($u, $o) = each($stacjeposr))
+	{
+		echo $o.", ";
+	}
+	echo "<br><br><font color=\"red\"><b>Stacje odebrane bezpośrednio (<u>".count($stacjebezposr)."</u>):</b></font> ";
+	while(list($u, $o) = each($stacjebezposr))
+	{
+		echo $o.", ";
+	}	
 }
 
 ?>
