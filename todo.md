@@ -1,4 +1,4 @@
-﻿TODO:
+TODO:
 -angielska wersja/english version
 -przerobienie kodu na bardziej czytelny dla osob poslugujacych sie tylko angielskim/make the code more readable for English-spreaking programmers (variables names, comments etc.)
 -wiecej komenatrzy w kodzie/more comments
