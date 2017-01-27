@@ -1,0 +1,2 @@
+CHANGELOG:
+27/01/2017 - v.0.1.0beta - fixed problem with timezones
