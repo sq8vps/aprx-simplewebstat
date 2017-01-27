@@ -5,3 +5,5 @@ TODO:
 -wykresy/charts
 -przetwarzanie pozycji stacji i wyswietlanie odleglosci, stacje DX/parsing stations position and showing distance from our station, showing DX stations
 -rozbicie kodu na mniejsze pliki/divide code to smaller files
+ffff
+aaa
