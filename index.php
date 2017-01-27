@@ -1,4 +1,21 @@
-﻿<html>
+﻿<?php
+/*********************************************************************************************************************
+PHP statistics generator from APRX log data file (aprx-rf.log)
+Version: 0.1.0 beta
+It may be very unstable. It was written in very non-efficient way without a lot of good programming rules. And I'm still learning PHP.
+Author: Piotr SQ8VPS
+You can modify this code, publish it, but please give a credit to original author. Only for non-commercial use.
+
+Generator statystyk PHP z pliku logu APRX (aprx-rf.log)
+Wersja 0.1.0 beta
+Program może być bardzo niestabilny. Jest póki co kompletnie niezoptymalizowany, napisany w wielu miejscach bez poszanowania zasad dobrego programowania. A ja wciąż uczę się PHP.
+Autor: Piotr SQ8VPS
+Możesz modyfikować ten kod i udostępniać go, ale musisz wskazać autora oryginalneg kodu. Tylko do uzytku niekomercyjnego.
+**********************************************************************************************************************/
+
+?>
+
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="Description" content="Statystyki APRX" />
