@@ -1,2 +1,4 @@
 CHANGELOG:
 27/01/2017 - v.0.1.0beta - fixed problem with timezones
+03/03/2017 - v.1.0.0beta - script parted to smaller php files, English version, some improvements, but no additional functionality
+
