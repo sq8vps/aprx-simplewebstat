@@ -3,14 +3,22 @@
 This file is a part of SIMPLE WEB STATICSTICS GENERATOR FROM APRX LOG FILE
 It's very simple and small APRX statictics generator in PHP. It's parted to smaller files and they will work independent from each other (but you always need chgif.php).
 This script may have a lot of bugs, problems and it's written in very non-efficient way without a lot of good programming rules. But it works for me.
-Author: Peter SQ8VPS, sq8vps[--at--]gmail.com
+Author: Peter SQ8VPS, sq8vps[--at--]gmail.com & Alfredo IZ7BOJ
 You can modify this program, but please give a credit to original author. Program is free for non-commercial use only.
-(C) Peter SQ8VPS 2017
+(C) Peter SQ8VPS & Alfredo IZ7BOJ 2017-2018
+
+Version 1.2beta
 *******************************************************************************************/
 ?>
 <?php
-session_start();
-if(!isset($_SESSION['if']))
+include 'config.php';
+include 'common.php';
+
+logexists();
+
+
+session_start(); //start session
+if(!isset($_SESSION['if'])) //if interface not defined
 {
 	header('Refresh: 0; url=chgif.php?chgif=1');
 	die();
@@ -55,7 +63,6 @@ if($lang == "en")
 <?php
 }
 
-$logpath = "/var/log/aprx/aprx-rf.log";
 $lines = 0;
 $rx = 0;
 $tx = 0;
@@ -67,8 +74,12 @@ $framespermin = 0;
 $time1 = 0;
 $time2 = 0;
 
+$isservers = array();
+$interfaces = array();
+
 if(!isset($_GET['time']) or ($_GET['time'] == ""))
 {
+	$_GET['time'] = 1;
 	$time = time() - 3600;
 } 
 elseif($_GET['time'] == "e")
@@ -102,6 +113,7 @@ function stationparse($frame)
 				$receivedstations[$stationcall] = 1; //add callsign to the list
 			}
 		}
+		return 0;
 	}
 	
 } 
@@ -152,9 +164,61 @@ if(empty($unique[1]))
 }
 array_multisort($receivedstations, SORT_DESC);
 
+$cputemp = NULL;
+$cpufreq = NULL;
+$uptime = NULL;
+if (file_exists ("/sys/class/thermal/thermal_zone0/temp")) {
+    exec("cat /sys/class/thermal/thermal_zone0/temp", $cputemp);
+    $cputemp = $cputemp[0] / 1000;
+}
+
+if (file_exists ("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")) {
+	exec("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq", $cpufreq);
+	$cpufreq = $cpufreq[0] / 1000;
+}
+
+$uptime = shell_exec('uptime -p');
+
+//part for reading from aprx.conf file	
+//will be developed  
+/*	
+$lines2 = 0;	
+$conffile = file($confpath); //read config file
+$linesinconf = count($conffile); //get number of lines in aprx.conf
+while ($lines2 < $linesinconf) { //read line by line
+    $line = $conffile[$lines2];
+	
+	$xz = strpos($line, "server ");
+	if($xz !== false)
+	{
+		for($cc = 0; $cc < strlen($line); $cc++)
+		{
+			if(($line[$cc] != " ") and ($line[$cc] != "#"))
+			{
+				$xx = explode(substr($line, $xz + 7), " ");
+				array_push($servers, $xx[0]);
+				break;
+			} else if($line[$cc] == "#") break;
+		}
+		
+	}
+	
+	
+	
+	$lines2++;
+	
+	
+}
+*/
+
+
+
 if($lang == "en")
 {
-	echo "<b>Number of frames in log: </b>".($rx + $tx + $is + $other);
+	echo "<b>System uptime: </b>".$uptime;
+	echo "<br><b>CPU temperature: </b>".$cputemp;
+	echo "<br><b>CPU frequency: </b>".$cpufreq;
+	echo "<br><b>Number of frames in log: </b>".($rx + $tx + $is + $other);
 	echo "<br><b>Number of frames received on radio: </b>".$rx;
 	echo "<br><b>Number of frames transmitted on radio: </b>".$tx;
 	echo "<br><b>Number of frames received from APRS-IS: </b>".$is;
@@ -166,7 +230,7 @@ if($lang == "en")
 	}
 	?>
 	<br>
-	<br><b>Show:</b> <a href="summary.php">Summary and received stations</a> - <a href="stations.php">Stations' informations</a> - <a href="frames.php">Show frames from specified station</a>
+<br><b>Show:</b> <a href="summary.php">Summary and received stations</a> - <a href="stations.php">Stations' informations</a> - <a href="frames.php">Show frames from specified station</a> - <a href="details.php">Show details of a specified station</a>
 	<br><br><hr>
 	<br><br> <form action="summary.php" method="get">
 	Show stations since last: 
@@ -188,7 +252,7 @@ if($lang == "en")
 	echo "<br><pre><font color=\"blue\"><b>Callsign&nbsp;&nbsp;&nbsp;&nbsp;Points</b></font><br>";
 	while(list($c, $nm) = each($receivedstations))
 	{
-		echo $c; //callsign
+		echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">'.$c.'</a>'; //callsign
 		$spaces = 12 - strlen($c);
 		for($i = 0; $i < $spaces; $i++) 
 		{
@@ -198,7 +262,10 @@ if($lang == "en")
 		echo '<br>';
 	}
 } else {
-	echo "<b>Wszystkich ramek w logu: </b>".($rx + $tx + $other + $is);
+	echo "<b>Czas działania systemu: </b>".$uptime;
+	echo "<br><b>Temperatura CPU: </b>".$cputemp;
+	echo "<br><b>Częstotliwość CPU: </b>".$cpufreq;
+	echo "<br><b>Wszystkich ramek w logu: </b>".($rx + $tx + $other + $is);
 	echo "<br><b>Ramek odebranych przez sieć radiową: </b>".$rx;
 	echo "<br><b>Ramek nadanych przez sieć radiową: </b>".$tx;
 	echo "<br><b>Ramek odebranych z APRS-IS: </b>".$is;
@@ -210,7 +277,7 @@ if($lang == "en")
 	}
 	?>
 	<br>
-	<br><b>Pokaż:</b> <a href="summary.php">Podsumowanie i odebrane stacje</a> - <a href="stations.php">Informacje o stacjach</a> - <a href="frames.php">Pokaż ramki wybranej stacji</a>
+<br><b>Pokaż:</b> <a href="summary.php">Podsumowanie i odebrane stacje</a> - <a href="stations.php">Informacje o stacjach</a> - <a href="frames.php">Pokaż ramki wybranej stacji</a> - <a href="details.php">Pokaż szczegóły wybranej stacji</a>
 	<br><br><hr>
 	<br><br> <form action="summary.php" method="get">
 	Pokaż stacje z czasu: 
@@ -232,7 +299,7 @@ if($lang == "en")
 	echo "<br><pre><font color=\"blue\"><b>Znak\t&nbsp;&nbsp;&nbsp;&nbsp;Punkty</b></font><br>";
 	while(list($c, $nm) = each($receivedstations))
 	{
-		echo $c; //callsign
+		echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">'.$c.'</a>'; //callsign
 		$spaces = 12 - strlen($c);
 		for($i = 0; $i < $spaces; $i++) 
 		{
@@ -244,7 +311,8 @@ if($lang == "en")
 }
 
 ?>
+</pre>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-<center>(C) 2017 Peter SQ8VPS</center>
+<center><a href="https://github.com/sq8vps/aprx-simplewebstat" target="_blank">APRX Simple Webstat version <?php echo $asw_version; ?></a> by Peter SQ8VPS and Alfredo IZ7BOJ</center>
 </body>
 </html>
