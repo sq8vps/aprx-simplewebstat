@@ -33,7 +33,7 @@ For example it's SP in Poland or HU in Hungary.
 $cntalias = "SP";
 ```
 
-Normally every time you open statistics website, you have to etner interface callsign. If you want to set static interface callsign (but it can be temporarily changed via website for one session), you can do here:
+Normally every time you open statistics website, you have to enter interface callsign. If you want to set static interface callsign (but it can be temporarily changed via website for one session), you can do this here:
 ```
 $static_if = 1;
 $static_call = "N0CALL-11;
