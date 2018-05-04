@@ -3,5 +3,6 @@ CHANGELOG:
 03/03/2017 - v.1.0.0beta - script parted to smaller php files, English version, some improvements, but no additional functionality
 08/04/2018 - v.1.1.0beta - links to aprs.fi from callsigns, optional static interface call, small esthetic changes and improvements, fixed some bugs
 04/05/2018 - v.1.2.0beta - details.php with detailed informations about selected station, system informations in summary.php, small changes
+05/05/2018 - v.1.2.1beta - fixed problem with Mic-E decoding when frame beginning was ' 
 
 

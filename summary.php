@@ -7,7 +7,7 @@ Author: Peter SQ8VPS, sq8vps[--at--]gmail.com & Alfredo IZ7BOJ
 You can modify this program, but please give a credit to original author. Program is free for non-commercial use only.
 (C) Peter SQ8VPS & Alfredo IZ7BOJ 2017-2018
 
-Version 1.2beta
+Version 1.2.1beta
 *******************************************************************************************/
 ?>
 <?php
@@ -216,8 +216,8 @@ while ($lines2 < $linesinconf) { //read line by line
 if($lang == "en")
 {
 	echo "<b>System uptime: </b>".$uptime;
-	echo "<br><b>CPU temperature: </b>".$cputemp;
-	echo "<br><b>CPU frequency: </b>".$cpufreq;
+	echo "<br><b>CPU temperature: </b>".$cputemp." °C";
+	echo "<br><b>CPU frequency: </b>".$cpufreq." MHz";
 	echo "<br><b>Number of frames in log: </b>".($rx + $tx + $is + $other);
 	echo "<br><b>Number of frames received on radio: </b>".$rx;
 	echo "<br><b>Number of frames transmitted on radio: </b>".$tx;
@@ -263,8 +263,8 @@ if($lang == "en")
 	}
 } else {
 	echo "<b>Czas działania systemu: </b>".$uptime;
-	echo "<br><b>Temperatura CPU: </b>".$cputemp;
-	echo "<br><b>Częstotliwość CPU: </b>".$cpufreq;
+	echo "<br><b>Temperatura CPU: </b>".$cputemp." °C";
+	echo "<br><b>Częstotliwość CPU: </b>".$cpufreq." MHz";
 	echo "<br><b>Wszystkich ramek w logu: </b>".($rx + $tx + $other + $is);
 	echo "<br><b>Ramek odebranych przez sieć radiową: </b>".$rx;
 	echo "<br><b>Ramek nadanych przez sieć radiową: </b>".$tx;

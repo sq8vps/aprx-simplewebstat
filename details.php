@@ -7,7 +7,7 @@ Author: Peter SQ8VPS, sq8vps[--at--]gmail.com & Alfredo IZ7BOJ
 You can modify this program, but please give a credit to original author. Program is free for non-commercial use only.
 (C) Peter SQ8VPS & Alfredo IZ7BOJ 2017-2018
 
-Version 1.2beta
+Version 1.2.1beta
 *******************************************************************************************/
 include 'config.php';
 include 'common.php';
@@ -214,14 +214,15 @@ function frameparse($frame)
 		
 		if($aa[0] == $scall)
 		{
+			
 			$noofframes++;
 			if($posframefound and $otherframefound) return;
 			$bb = explode(":", $packet); //get only info field, so everything after : separator
 			$dd = substr($bb[1], 0); //i have no idea, but i must do this, because without this there are some problems
-					
-			if(($dd[0] === "@") or ($dd[0] === "!") or ($dd[0] === "=") or ($dd[0] === "/") or (ord($dd[0]) === 96) or ($dd[0] === "\'")) //if it's a frame with position or Mic-E position	
-			{
+						
 				
+			if(($dd[0] === "@") or ($dd[0] === "!") or ($dd[0] === "=") or ($dd[0] === "/") or (ord($dd[0]) === 96) or ($dd[0] === "'")) //if it's a frame with position or Mic-E position	
+			{
 				
 				if($posframefound) return; //if we have already position frame parsed, just skip it
 			
@@ -237,7 +238,7 @@ function frameparse($frame)
 				
 				$posframefound = 1; //newest position frame found
 				
-				if((ord($dd[0]) === 96) or ($dd[0] === "\'")) //if it's a Mic-E frame
+				if((ord($dd[0]) === 96) or ($dd[0] === "'")) //if it's a Mic-E frame
 				{
 					$mice = 1;
 					

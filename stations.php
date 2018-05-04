@@ -7,7 +7,7 @@ Author: Peter SQ8VPS, sq8vps[--at--]gmail.com & Alfredo IZ7BOJ
 You can modify this program, but please give a credit to original author. Program is free for non-commercial use only.
 (C) Peter SQ8VPS & Alfredo IZ7BOJ 2017-2018
 
-Version 1.2beta
+Version 1.2.1beta
 *******************************************************************************************/
 ?>
 <?php
@@ -155,7 +155,7 @@ function stationparse($frame) //function for parsing station information
 				{
 					$fg = 19;
 				}
-				if((ord($bb[0]) === 96) or ($bb[0] === "\'")) //special case - if Mic-E postion
+				if((ord($bb[0]) === 96) or ($bb[0] === "'")) //special case - if Mic-E postion
 				{
 					$fg = 7; //set symbol place to 7
 				}

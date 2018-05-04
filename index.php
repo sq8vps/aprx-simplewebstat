@@ -7,7 +7,7 @@ Author: Peter SQ8VPS, sq8vps[--at--]gmail.com & Alfredo IZ7BOJ
 You can modify this program, but please give a credit to original author. Program is free for non-commercial use only.
 (C) Peter SQ8VPS & Alfredo IZ7BOJ 2017-2018
 
-Version 1.2beta
+Version 1.2.1beta
 *******************************************************************************************/
 include 'config.php';
 include 'common.php';
