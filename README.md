@@ -28,7 +28,7 @@ $stationlon = 28.762225;
 ```
 
 And your regional country/state digipeater alias, which helps the software to distinguish between direct and digipeated frames.
-For example it's SP in Poland or HU in Hungary.
+For example it's SP in Poland or HU in Hungary:
 ```
 $cntalias = "SP";
 ```
