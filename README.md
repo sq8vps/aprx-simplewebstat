@@ -36,7 +36,7 @@ $cntalias = "SP";
 Normally every time you open statistics website, you have to enter interface callsign. If you want to set static interface callsign (but it can be temporarily changed via website for one session), you can do this here:
 ```
 $static_if = 1;
-$static_call = "N0CALL-11;
+$static_call = "N0CALL-11";
 $static_lang = "en";
 ```
 Set $static_if to 1 to enable. Available languages are en for English and pl for Polish.
