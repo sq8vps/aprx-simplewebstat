@@ -164,9 +164,21 @@ if(empty($unique[1]))
 }
 array_multisort($receivedstations, SORT_DESC);
 
+$sysver = NULL;
+$kernelver = NULL;
+$aprxver = NULL;
 $cputemp = NULL;
 $cpufreq = NULL;
 $uptime = NULL;
+
+$sysver = shell_exec ("cat /etc/os-release | grep PRETTY_NAME |cut -d '=' -f 2");
+$kernelver = shell_exec ("uname -r");
+
+// following command works only if aprx is installed using apt-get
+//$aprxver = shell_exec ("aprx --v | grep version: | cut -d ':' -f 2");
+
+$aprxver = shell_exec ("apt-cache policy aprx | grep Installed | cut -d ':' -f 2");
+
 if (file_exists ("/sys/class/thermal/thermal_zone0/temp")) {
     exec("cat /sys/class/thermal/thermal_zone0/temp", $cputemp);
     $cputemp = $cputemp[0] / 1000;
@@ -211,7 +223,20 @@ while ($lines2 < $linesinconf) { //read line by line
 }
 */
 
+$cyclesize = NULL;
+$myloc = NULL;
+$server = NULL;
+$txactive = NULL;
+$numradioint = NULL;
+$digiactive = NULL;
 
+//parse parameters in aprx.conf using shell commands and grep. Don't consider commented rows and blanks
+$cyclesize = shell_exec ("cat $confpath |  grep '^[[:blank:]]*[^[:blank:]#]' | grep cycle-size | awk  '{print $2}'");
+$myloc = shell_exec ("cat $confpath | grep '^[[:blank:]]*[^[:blank:]#]' | grep 'myloc' | grep -v 'beacon' | cut -d ' ' -f2-");
+$server = shell_exec ("cat $confpath | grep '^[[:blank:]]*[^[:blank:]#]' | grep server |  awk  '{print $2}'");
+$txactive = shell_exec ("cat $confpath | grep '^[[:blank:]]*[^[:blank:]#]' | grep tx-ok |  awk  '{print $2}'");
+$numradioint = shell_exec ("cat $confpath | grep '^[[:blank:]]*[^[:blank:]#]' | grep ax25-device -c");
+$digiactive = shell_exec ("cat $confpath | grep '^[[:blank:]]*[^[:blank:]#]' | grep '<digipeater>' -c");
 
 if($lang == "en")
 {
@@ -311,8 +336,102 @@ if($lang == "en")
 }
 
 ?>
+
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title></title>
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="1"
+ cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td align="center">
+<table style="text-align: left; height: 116px; width: 500px;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr align="center">
+      <td style="width: 566px;" colspan="2" rowspan="1"><span
+      style="color: red; font-weight: bold;">SYSTEM STATUS</span></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>System Version: </b></td>
+      <td style="width: 566px;"><?php echo $sysver ?></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>Kernel Version: </b></td>
+      <td style="width: 566px;"><?php echo $kernelver ?></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>APRX Version: </b></td>
+      <td style="width: 566px;"><?php echo $aprxver ?></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>System uptime: </b></td>
+      <td style="width: 566px;"><?php echo $uptime ?></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>CPU temperature:</b></td>
+      <td style="width: 566px;"><?php echo $cputemp ?> °C </td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>CPU frequency: </b></td>
+      <td style="width: 566px;"><?php echo $cpufreq ?> MHz </td>
+    </tr>
+ </tbody>
+</table>
+<br>
+</body>
+</td>
+
+<body>
+<td align="center">
+<table style="text-align: left; height: 116px; width: 500px;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr align="center">
+      <td style="width: 566px;" colspan="2" rowspan="1"><span
+      style="color: red; font-weight: bold;">APRX CONFIG PARAMETERS</span></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>Beacon Interval: </b></td>
+      <td style="width: 566px;"><?php echo $cyclesize ?></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>APRS-IS server: </b></td>
+      <td style="width: 566px;"><?php echo $server ?></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>Location: </b></td>
+      <td style="width: 566px;"><?php echo $myloc ?></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>TX active? </b></td>
+      <td style="width: 566px;"><?php echo $txactive ?></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>Number of radio ports:</b></td>
+      <td style="width: 566px;"><?php echo $numradioint ?></td>
+    </tr>
+    <tr>
+      <td style="width: 168px;"><b>Digipeater active? </b></td>
+      <td style="width: 566px;"><?php if ($digiactive == 1) echo "true" ?></td>
+    </tr>
+ </tbody>
+</table>
+<br>
+</body>
+</td>
+</tr>
+  </tbody>
+</table>
+
+</html>	
+	
 </pre>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br>
 <center><a href="https://github.com/sq8vps/aprx-simplewebstat" target="_blank">APRX Simple Webstat version <?php echo $asw_version; ?></a> by Peter SQ8VPS and Alfredo IZ7BOJ</center>
 </body>
 </html>
