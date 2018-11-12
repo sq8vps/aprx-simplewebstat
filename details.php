@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /******************************************************************************************
 This file is a part of SIMPLE WEB STATICSTICS GENERATOR FROM APRX LOG FILE
 It's very simple and small APRX statictics generator in PHP. It's parted to smaller files and they will work independent from each other (but you always need chgif.php).
@@ -41,7 +41,7 @@ $otherframe = "";
 $lastpath = "";
 
 $symboltab = "";
-$symbol = ""; 
+$symbol = "";
 
 $comment = "";
 $status = "";
@@ -59,19 +59,19 @@ function nmeatodec($data, $shift)
 	$dec = 0;
 	$dec += ($data[$shift] * 10);
 	$dec += $data[1 + $shift];
-						
+
 	$temp = 0;
-						
+
 	$temp += ($data[2 + $shift] * 10);
 	$temp += $data[3 + $shift];
-						
+
 	$temp += ($data[5 + $shift] / 10);
 	$temp += ($data[6 + $shift] / 100);
-						
+
 	$temp /= 60;
-						
+
 	$dec += $temp;
-	
+
 	return $dec;
 }
 
@@ -83,7 +83,7 @@ function mice_decode($dest, $info)
 	$declat = 0;
 	$declon = 0;
 	$ghf = ord($dest[0]);
-	
+
     if($ghf <= 57) $declat += ($ghf - 48) * 100000;
     else if(($ghf >= 65) && ($ghf <= 74)) $declat += ($ghf - 65) * 100000;
     else if(($ghf >= 80) && ($ghf <= 89)) $declat += ($ghf - 80) * 100000;
@@ -318,9 +318,9 @@ function frameparse($frame)
 
 }
 
-if(isset($_GET['call']) && ($_GET['call'] != ""))
+if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 {
-	$scall = strtoupper($_GET['call']);
+	$scall = strtoupper($_GET['getcall']);
 	$logfile = file($logpath); //read log file
 	$linesinlog = count($logfile);
 	$lines = $linesinlog - 1;
@@ -330,7 +330,7 @@ if(isset($_GET['call']) && ($_GET['call'] != ""))
 		$lines--;
 	}
 	
-} 
+}
 
 if($lang == "en")
 {
@@ -348,19 +348,21 @@ if($lang == "en")
 <h2>for interface <font color="red"><b><?php echo $call; ?></b></font> - station's details</h2> <a href="chgif.php?chgif=1">Change interface</a></center>
 <br><br><br>
 
-<br><b>Show:</b> <a href="summary.php">Summary and received stations</a> - <a href="stations.php">Stations' informations</a> - <a href="frames.php">Show frames from specified station</a> - <a href="details.php">Show details of a specified station</a>
+<!-- <br><b>Show:</b> <a href="summary.php">Summary and received stations</a> - <a href="stations.php">Stations' informations</a> - <a href="frames.php">Show frames from specified station</a> - <a href="details.php">Show details of a specified station</a>
+-->
 <br><br><hr>
 </center>
 <br>
 
 <form action="details.php" method="get">
-Show details of station: <input type="text" name="call" <?php if(isset($_GET['call'])) echo 'value="'.$_GET['call'].'"'; ?>>
+Show details of station: <input type="text" name="getcall" <?php if(isset($_GET['getcall'])) echo 'value="'.$_GET['getcall'].'"'; ?>>
 <input type="submit" value="Show">
 </form>
 <br>
+
 <?php
 
-if(isset($_GET['call']) && ($_GET['call'] != ""))
+if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 {
 	if(($posframefound == 0) && ($otherframefound == 0))
 	{
@@ -432,7 +434,7 @@ Pokaż szczegóły stacji: <input type="text" name="call" <?php if(isset($_GET['
 
 <?php
 
-if(isset($_GET['call']) && ($_GET['call'] != ""))
+if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 {
 	if(($posframefound == 0) && ($otherframefound == 0))
 	{
