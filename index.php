@@ -19,10 +19,10 @@ if((!isset($_SESSION['if'])) or (isset($_SESSION['if']) and ($_SESSION['if'] == 
 	if(($static_if == 1) && ($static_call != ""))
 	{
 		session_start();
-		
+
 		$callsign = strtoupper($static_call); //uppercase the static callsign
 		$_SESSION['call'] = $callsign;
-	
+
 		$callsignraw = $callsign;
 		while(strlen($callsignraw) < 9)
 		{
@@ -39,7 +39,7 @@ if((!isset($_SESSION['if'])) or (isset($_SESSION['if']) and ($_SESSION['if'] == 
 		{
 			$_SESSION['lang'] = "en";
 		}
-		
+
 		header('Refresh: 0; url=summary.php');
 	}
 	else

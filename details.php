@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /******************************************************************************************
 This file is a part of SIMPLE WEB STATICSTICS GENERATOR FROM APRX LOG FILE
 It's very simple and small APRX statictics generator in PHP. It's parted to smaller files and they will work independent from each other (but you always need chgif.php).
@@ -11,6 +11,7 @@ Version 1.2.1beta
 *******************************************************************************************/
 include 'config.php';
 include 'common.php';
+include 'functions.php';
 
 logexists();
 session_start();
@@ -54,269 +55,7 @@ $mice = 0;
 $declat = 0;
 $declon = 0;
 
-function nmeatodec($data, $shift)
-{
-	$dec = 0;
-	$dec += ($data[$shift] * 10);
-	$dec += $data[1 + $shift];
 
-	$temp = 0;
-
-	$temp += ($data[2 + $shift] * 10);
-	$temp += $data[3 + $shift];
-
-	$temp += ($data[5 + $shift] / 10);
-	$temp += ($data[6 + $shift] / 100);
-
-	$temp /= 60;
-
-	$dec += $temp;
-
-	return $dec;
-}
-
-function mice_decode($dest, $info)
-{
-   //conversion of Mic-E posistion to DDMMmm format
-	global $declat;
-	global $declon;
-	$declat = 0;
-	$declon = 0;
-	$ghf = ord($dest[0]);
-
-    if($ghf <= 57) $declat += ($ghf - 48) * 100000;
-    else if(($ghf >= 65) && ($ghf <= 74)) $declat += ($ghf - 65) * 100000;
-    else if(($ghf >= 80) && ($ghf <= 89)) $declat += ($ghf - 80) * 100000;
-
-    $ghf = ord($dest[1]);
-    if($ghf <= 57) $declat += ($ghf - 48) * 10000;
-    else if(($ghf >= 65) && ($ghf <= 74)) $declat += ($ghf - 65) * 10000;
-    else if(($ghf >= 80) && ($ghf <= 89)) $declat += ($ghf - 80) * 10000;
-
-    $ghf = ord($dest[2]);
-    if($ghf <= 57) $declat += ($ghf - 48) * 1000;
-    else if(($ghf >= 65) && ($ghf <= 74)) $declat += ($ghf - 65) * 1000;
-    else if(($ghf >= 80) && ($ghf <= 89)) $declat += ($ghf - 80) * 1000;
-
-    $ghf = ord($dest[3]);
-    if($ghf <= 57)
-    {
-        $declat += ($ghf - 48) * 100;
-        $declat = $declat * (-1);
-    }
-    else if(($ghf >= 80) && ($ghf <= 89))
-    {
-        $declat += ($ghf - 80) * 100;
-    }
-
-    $looff = 0;
-
-    $ghf = ord($dest[4]);
-    if($ghf <= 57)
-    {
-        $declat += ($ghf - 48) * 10;
-        $looff = 0;
-    }
-    else if(($ghf >= 80) && ($ghf <= 89))
-    {
-        $declat += ($ghf - 80) * 10;
-        $looff = 100;
-    }
-
-    $lonneg = 0;
-
-    $ghf = ord($dest[5]);
-    if($ghf <= 57)
-    {
-        $declat += $ghf - 48;
-        $lonneg = 1;
-    }
-    else if(($ghf >= 80) && ($ghf <= 89))
-    {
-        $declat += $ghf - 80;
-        $lonneg = -1;
-    }
-
-    $ghf = ord($info[1]);
-    $ghf -= 28;
-    $ghf += $looff;
-    if(($ghf <= 189) && ($ghf >= 180)) $ghf -= 80;
-    else if(($ghf <= 199) && ($ghf >= 190)) $ghf -= 190;
-
-    $declon += ($ghf * 10000);
-
-    $ghf = ord($info[2]);
-    $ghf -= 28;
-    if($ghf >= 60) $ghf -= 60;
-
-    $declon += ($ghf * 100);
-
-    $ghf = ord($info[3]);
-    $ghf -= 28;
-    $declon += $ghf;
-
-	
-    $declon = $declon * $lonneg;
-	
-
-	//converting DDMMmm to DDdddddd
-	//latitude
-	$tt = 0;
-	$tt += (int)($declat / 10000);
-	
-	$temp = ($declat % 10000) / 100;
-	$temp /= 60;
-	
-	$declat = $tt + $temp;
-	
-	
-	//longtitude
-	$tt = 0;
-	$tt += (int)($declon / 10000);
-	
-	
-	$temp = ($declon % 10000) / 100;
-	$temp /= 60;
-	
-	$declon = $tt + $temp;
-
-}
-
-
-function frameparse($frame)
-{
-	global $callraw;
-	global $scall;
-	global $posframefound;
-	global $otherframefound;
-	global $posframe;
-	global $otherframe;
-	global $lastpath;
-	global $noofframes;
-	global $symbol;
-	global $symboltab;
-	global $stationlat;
-	global $stationlon;
-	global $distance;
-	global $declat;
-	global $declon;
-	global $posdate;
-	global $postime;
-	global $comment;
-	global $status;
-	global $otherdate;
-	global $othertime;
-	global $mice;
-	global $bearing;
-
-		$packet = substr($frame, 36); //get only frame, without interface call, date etc.
-		$aa = explode(">", $packet); //get the callsign
-		
-		if($aa[0] == $scall)
-		{
-			
-			$noofframes++;
-			if($posframefound and $otherframefound) return;
-			$bb = explode(":", $packet); //get only info field, so everything after : separator
-			$dd = substr($bb[1], 0); //i have no idea, but i must do this, because without this there are some problems
-						
-				
-			if(($dd[0] === "@") or ($dd[0] === "!") or ($dd[0] === "=") or ($dd[0] === "/") or (ord($dd[0]) === 96) or ($dd[0] === "'")) //if it's a frame with position or Mic-E position	
-			{
-				
-				if($posframefound) return; //if we have already position frame parsed, just skip it
-			
-				
-			
-				$posframe = $packet; //save whole posistion frame
-				
-				$posdate = substr($frame, 0, 10); //extract date
-				$postime = substr($frame, 11, 8); //extract time
-				
-				$path = explode(">", $bb[0]); //take everything after station callsign and before info field (see bb[0])
-				$lastpath = $path[1]; //take only path part
-				
-				$posframefound = 1; //newest position frame found
-				
-				if((ord($dd[0]) === 96) or ($dd[0] === "'")) //if it's a Mic-E frame
-				{
-					$mice = 1;
-					
-					$symboltab = $dd[8];
-					$symbol = $dd[7];
-					
-					$destaddr = explode(",", $aa[1]); //get destination address, which encodes latitude
-					
-					mice_decode($destaddr[0], $bb[1]);
-					
-					$comment = substr($bb[1], 9);
-					
-				}
-				else //if it's a standard frame
-				{
-					$mice = 0;
-					if($dd[7] === 'z') //if the positions contains timestamp
-					{
-						$symboltab = $dd[16];
-						$symbol = $dd[26];
-						$comment = substr($dd, 27);
-						
-						$shft = 7;
-
-					} else 
-					{
-						$symboltab = $dd[9];
-						$symbol = $dd[19];
-						$comment = substr($dd, 20);
-						$shft = 0;
-					}	
-
-					//convert NMEA to decimal degrees
-					$declat = nmeatodec($dd, 1 + $shft);
-					if($dd[8 + $shft] == 'S') $declat *= -1;
-					$declon = nmeatodec($dd, 11 + $shft);
-					if($dd[18 + $shft] == 'W') $declon *= -1;
-						
-
-				}
-				
-				//haversine formula for distance calculation	
-				$latFrom = deg2rad($stationlat);
-				$lonFrom = deg2rad($stationlon);
-				$latTo = deg2rad($declat);
-				$lonTo = deg2rad($declon);
-
-				$latDelta = $latTo - $latFrom;
-				$lonDelta = $lonTo - $lonFrom;
-				
-				$bearing = rad2deg(atan2(sin($lonDelta)*cos($latTo), cos($latFrom)*sin($latTo)-sin($latFrom)*cos($latTo)*cos($latDelta)));
-				if($bearing < 0) $bearing += 360;
-
-				$angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
-				cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
-				$distance = round($angle * 6371, 2); //gives result in km rounded to 2 digits after comma
-				
-				$declat = round($declat, 5);
-				$declon = round($declon, 5);
-				$bearing = round($bearing, 1);
-									
-			}
-			else if(($dd[0] === ">") or ($dd[0] === "<") or ($dd[0] === "{")) //if it's a status or beacon frame
-			{
-				if($otherframefound) return; //if we have already status frame parsed, just skip it
-			
-				$otherframe = $packet; //save whole status frame
-				
-				$status = substr($dd, 1);
-				
-				$otherdate = substr($frame, 0, 10); //extract date
-				$othertime = substr($frame, 11, 8); //extract time
-				
-				$otherframefound = 1; //newest beacon frame found
-			}
-		}
-
-}
 
 if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 {
@@ -335,6 +74,7 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 if($lang == "en")
 {
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -344,13 +84,18 @@ if($lang == "en")
 <title>APRX statistics - stations' info</title>
 </head>
 <body>
+<?php
+if(file_exists($logourl)){
+?>
+<center><img src="<?php echo $logourl ?>" width="100px" height="100px" align="middle"></center><br>
+<?php
+}
+?>
 <center><font size="20"><b>APRX statistics</b></font>
-<h2>for interface <font color="red"><b><?php echo $call; ?></b></font> - station's details</h2> <a href="chgif.php?chgif=1">Change interface</a></center>
-<br><br><br>
-
-<!-- <br><b>Show:</b> <a href="summary.php">Summary and received stations</a> - <a href="stations.php">Stations' informations</a> - <a href="frames.php">Show frames from specified station</a> - <a href="details.php">Show details of a specified station</a>
--->
-<br><br><hr>
+<h2>for interface <font color="red"><b><?php echo $call; ?></b></font> - station's details</h2> <a href="chgif.php?chgif=1">Change interface</a>
+<br>
+<br><b>Show:</b> <a href="summary.php">Summary (main)</a> - <a href="frames.php">RAW frames from specified station</a> - <a href="details.php">Details of a specified station</a><br><br>
+<hr>
 </center>
 <br>
 
@@ -405,6 +150,7 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 
 }else {
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -414,12 +160,18 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 <title>Statystyki APRX - informacje o stacjach</title>
 </head>
 <body>
+<?php
+if(file_exists($logourl)){
+?>
+<center><img src="<?php echo $logourl ?>" width="100px" height="100px" align="middle"></center><br>
+<?php
+}
+?>
 <center><font size="20"><b>Statystyki APRX</b></font>
 <h2>dla interfejsu <font color="red"><b><?php echo $call; ?></b></font> - szczegóły stacji</h2> <a href="chgif.php?chgif=1">Zmień interfejs</a>
-<br><br><br>
-
-<br><b>Pokaż:</b> <a href="summary.php">Podsumowanie i odebrane stacje</a> - <a href="stations.php">Informacje o stacjach</a> - <a href="frames.php">Pokaż ramki wybranej stacji</a> - <a href="details.php">Pokaż szczegóły wybranej stacji</a>
-<br><br><hr>
+<br>
+<br><b>Pokaż:</b> <a href="summary.php">Podsumowanie (główna)</a> - <a href="frames.php">Surowe ramki wybranej stacji</a> - <a href="details.php">Szczegóły wybranej stacji</a><br><br>
+<hr>
 </center>
 <br>
 <form action="details.php" method="get">

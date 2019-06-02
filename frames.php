@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /******************************************************************************************
 This file is a part of SIMPLE WEB STATICSTICS GENERATOR FROM APRX LOG FILE
 It's very simple and small APRX statictics generator in PHP. It's parted to smaller files and they will work independent from each other (but you always need chgif.php).
@@ -31,6 +31,7 @@ $frames = array();
 if($lang == "en")
 {
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -40,12 +41,18 @@ if($lang == "en")
 <title>APRX statistics - frames search</title>
 </head>
 <body>
+<?php
+if(file_exists($logourl)){
+?>
+<center><img src="<?php echo $logourl ?>" width="100px" height="100px" align="middle"></center><br>
+<?php
+}
+?>
 <center><font size="20"><b>APRX statistics</b></font>
-<h2>for interface <font color="red"><b><?php echo $call; ?></b></font> - search frames</h2> <a href="chgif.php?chgif=1">Change interface</a></center>
-<br><br><br>
-<!-- <br><b>Show:</b> <a href="summary.php">Summary and received stations</a> - <a href="stations.php">Stations' informations</a> - <a href="frames.php">Show frames from specified station</a> - <a href="details.php">Show details of a specified station</a>
--->
-<br><br><hr>
+<h2>for interface <font color="red"><b><?php echo $call; ?></b></font> - search frames</h2> <a href="chgif.php?chgif=1">Change interface</a>
+<br>
+<br><b>Show:</b> <a href="summary.php">Summary (main)</a> - <a href="frames.php">RAW frames from specified station</a> - <a href="details.php">Details of a specified station</a><br><br>
+<hr>
 </center>
 <br>
 <form action="frames.php" method="get">
@@ -88,6 +95,7 @@ if(isset($_GET['getcall']) and ($_GET['getcall'] !== ""))
 }
 } else {
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -97,11 +105,18 @@ if(isset($_GET['getcall']) and ($_GET['getcall'] !== ""))
 <title>Statystyki APRX - szukaj ramek</title>
 </head>
 <body>
+<?php
+if(file_exists($logourl)){
+?>
+<center><img src="<?php echo $logourl ?>" width="100px" height="100px" align="middle"></center><br>
+<?php
+}
+?>
 <center><font size="20"><b>Statystyki APRX</b></font>
 <h2>dla interfejsu <font color="red"><b><?php echo $call; ?></b></font> - szukaj ramek</h2> <a href="chgif.php?chgif=1">Zmień interfejs</a>
-<br><br><br>
-<br><b>Pokaż:</b> <a href="summary.php">Podsumowanie i odebrane stacje</a> - <a href="stations.php">Informacje o stacjach</a> - <a href="frames.php">Pokaż ramki wybranej stacji</a> - <a href="details.php">Pokaż szczegóły wybranej stacji</a>
-<br><br><hr>
+<br>
+<br><b>Pokaż:</b> <a href="summary.php">Podsumowanie (główna)</a> - <a href="frames.php">Surowe ramki wybranej stacji</a> - <a href="details.php">Szczegóły wybranej stacji</a><br><br>
+<hr>
 </center>
 <br>
 <form action="frames.php" method="get">

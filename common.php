@@ -1,5 +1,5 @@
 <?php
-$asw_version = "1.2.1beta";
+$asw_version = "1.3.0beta";
 include 'config.php';
 
 function logexists()
@@ -12,7 +12,7 @@ function logexists()
 		echo '<font color="red" size="6"><b>Error. Cannot open APRX log file at '.$logpath.'.</b></font>';
 		echo '<br><br>Please check, if log file path in config.php is set correctly.<br>Plase check, if file '.$logpath.' exists.';
 		echo '<br><br><b>Pointless to continue.</b>';
-		echo '<br><br><br><br><br><br><center>APRX Simple Webstat version '.$asw_version.' by Peter SQ8VPS and Alfredo IZ7BOJ 2017-2018</center>';
+		echo '<br><br><br><br><br><br><center>APRX Simple Webstat version '.$asw_version.' by Peter SQ8VPS and Alfredo IZ7BOJ 2017-2019</center>';
 		die();
 	}
 	/*if(!file_exists($confpath))

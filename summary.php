@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /******************************************************************************************
 This file is a part of SIMPLE WEB STATICSTICS GENERATOR FROM APRX LOG FILE
 It's very simple and small APRX statictics generator in PHP. It's parted to smaller files and they will work independent from each other (but you always need chgif.php).
@@ -13,6 +13,7 @@ Version 1.2.2beta
 <?php
 include 'config.php';
 include 'common.php';
+include 'functions.php';
 
 logexists();
 
@@ -28,6 +29,7 @@ $lang = $_SESSION['lang'];
 if($lang == "en")
 {
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -37,14 +39,24 @@ if($lang == "en")
 <title>APRX statistics - summary</title>
 </head>
 <body>
+<?php
+if(file_exists($logourl)){
+?>
+<center><img src="<?php echo $logourl ?>" width="100px" height="100px" align="middle"></center><br>
+<?php
+}
+?>
 <center><font size="20"><b>APRX statistics</b></font>
 <h2>for interface <font color="red"><b><?php echo $call; ?></b></font> - summary</h2> <a href="chgif.php?chgif=1">Change interface</a>
-<br><br><hr><br>
+<br>
+<br><b>Show:</b> <a href="summary.php">Summary (main)</a> - <a href="frames.php">RAW frames from specified station</a> - <a href="details.php">Details of a specified station</a><br><br>
+<hr>
 </center>
 <br>
 <?php
 } else {
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -54,9 +66,18 @@ if($lang == "en")
 <title>Statystyki APRX - podsumowanie</title>
 </head>
 <body>
+<?php
+if(file_exists($logourl)){
+?>
+<center><img src="<?php echo $logourl ?>" width="100px" height="100px" align="middle"></center><br>
+<?php
+}
+?>
 <center><font size="20"><b>Statystyki APRX</b></font>
 <h2>dla interfejsu <font color="red"><b><?php echo $call; ?></b></font> - podsumowanie</h2> <a href="chgif.php?chgif=1">Zmień interfejs</a>
-<br><br><br>
+<br>
+<br><b>Pokaż:</b> <a href="summary.php">Podsumowanie (główna)</a> - <a href="frames.php">Surowe ramki wybranej stacji</a> - <a href="details.php">Szczegóły wybranej stacji</a><br><br>
+<hr>
 </center>
 <br>
 <?php
@@ -86,7 +107,7 @@ $viastations = array(); //stations received via digi
 if(!isset($_GET['time']) or ($_GET['time'] == "")) //if time range not specified
 {
 	$time = time() - 3600; //so take frames from last 1 hour
-} 
+}
 elseif($_GET['time'] == "e") //if whole log
 {
 	$time = 0;
@@ -96,138 +117,7 @@ else //else if the time range is choosen
 	$time = time() - ($_GET['time'] * 3600); //convert hours to seconds
 }
 
-function stationparse($frame) //function for parsing station information
-{
-	global $receivedstations;
-	global $staticstations;
-	global $movingstations;
-	global $otherstations;
-	global $viastations; //stations received via digi
-	global $directstations; //stations received directly
-	global $callraw;
-	global $time;
-	global $cntalias;
-	$fg = 0;
-	if(strpos($frame, $callraw." R")) //if frame received by RF
-	{
-		$uu = substr($frame, 0, 19);  //take only the part of the line, where date and time is
-		$uu = strtotime($uu) + date('Z'); //convert string with date and time to the Unix timestamp and add a timezone shift
-		if($uu > $time) //if frame was received in out time range
-		{
-			$aa = explode(">", $frame); //divide frame from > separator to get station's callsign
-			$stationcall = substr($aa[0], strpos($aa[0], $callraw." R ") + strlen($callraw." R ")); //remove date and time, interface call up to the received station's call, so that we get only station's call
-			
-			if(array_key_exists($stationcall, $receivedstations)) //if this callsign is already on stations list
-			{
-				$receivedstations[$stationcall]++; //increment the number of frames from this station
-			} else //if this callsign is not on the list
-			{
-				$receivedstations[$stationcall] = 1; //add callsign to the list
-			}
-			
-			$bb = substr($frame, 46); //let's cut temporarily some part of a frame to make sure, that there is no : character, because we want it only as a separator between frame path and info field
-			//------DEBUG-----^^^^^^ this can make some problems, beacuse it's very primitive
-			$bb = substr($bb, strpos($bb, ":") + 1); //get whole date from the frame after a : character, to get info field
-			if(($bb[0] === "@") or ($bb[0] === "!") or ($bb[0] === "=") or ($bb[0] === "/") or (ord($bb[0]) === 96) or ($bb[0] === "\'")) //if it's a frame with position or Mic-E position			
-			{
-				if($bb[7] === 'z') //if the positions contains timestamp shift reading symbol data by 7 characters
-				{
-					$fg = 26;
-				} else 
-				{
-					$fg = 19;
-				}
-				if((ord($bb[0]) === 96) or ($bb[0] === "'")) //special case - if Mic-E postion
-				{
-					$fg = 7; //set symbol place to 7
-				}
-					if(in_array($bb[$fg], array('!', '#', '%', '&', '+', ',', '-', '.', '/', ':', ';', '?', '@', 'A', 'B', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'T', 'V', 'W', 'Z', '\\', ']', '_', '`', 'c', 'd', 'h', 'i', 'l', 'm', 'n', 'o', 'q', 'r', 't', 'w', 'x', 'y', 'z', '}')))
-					{
-						if(!in_array($stationcall, $staticstations))
-						{
-							$staticstations[] = $stationcall;
-						}
-					}	
-					elseif(in_array($bb[$fg], array('$', '\'', '(', ')', '*', '<', '=', '>', 'C', 'F', 'P', 'R', 'U', 'X', 'Y', '[', '^', 'a', 'b', 'f', 'g', 'j', 'k', 'p', 's', 'u', 'v')))
-					{
-						if(!in_array($stationcall, $movingstations))
-						{
-							$movingstations[] = $stationcall;
-						}
-					}
-					else
-					{
-						if(!in_array($stationcall, $otherstations))
-						{
-							$otherstations[] = $stationcall;
-						}
-					}	
-			}
-			
-			$cc = substr($frame, strpos($frame, ">")); //temporarily get everything after > symbol (after received station callsign)
-			$cc = substr($cc, 0, strpos($cc, ":")); //and then everything before info field separator, so that we have only frame path right now
-			if(strpos($cc, '*') !== false) //if there is a * the frame was definitely not heard directly
-			{
-				if(!in_array($stationcall, $viastations))
-				{
-					$viastations[] = $stationcall;
-				}
-			} else //if there is no *
-			{
-				if($cntalias == "") //if no national alias selected, take frame as not direct
-				{
-						if(!in_array($stationcall, $viastations))
-						{
-							$viastations[] = $stationcall;
-						}	
-						return;	
-				}
-				$cntpos = strpos($cc, $cntalias);
-				if((strpos($cc, $cntalias) !== false) and ($cc[$cntpos + 3] == "-")) //if there is national untraced alias without *, the frame still can be heard indirectly
-				{
-					if($cc[$cntpos + 2] == $cc[$cntpos + 4]) //if this path element has n=N, for example SP2-2, it was heard directly
-					{
-						if(!in_array($stationcall, $directstations))
-						{
-							$directstations[] = $stationcall;
-						}
-					} else //else if n!=N, for example SP2-1, the frame was PROBABLY heard via digi
-					{
-						if(!in_array($stationcall, $viastations))
-						{
-							$viastations[] = $stationcall;
-						}
-					}
-				} else //if there is no national alias, it was heard directly
-				{
-					if(!in_array($stationcall, $directstations))
-					{
-						$directstations[] = $stationcall;
-					}
-				}
-			}
-		}
-	}
-	
-}
 
-function load($frame, $end)
-{
-	global $framespermin;
-	global $time1;
-	global $time2;
-	if($end === 0)
-	{
-		$time1 = substr($frame, 0, 19);
-		$time1 = strtotime($time1);
-	} elseif($end === 1)
-	{
-		$time2 = substr($frame, 0, 19);
-		$time2 = strtotime($time2);
-		$framespermin = 20 / (($time2 - $time1) / 60);
-	}
-	
-}
 
 $logfile = file($logpath); //read log file
 $linesinlog = count($logfile);
@@ -328,6 +218,9 @@ $txactive = shell_exec ("cat $confpath | grep '^[[:blank:]]*[^[:blank:]#]' | gre
 $numradioint = shell_exec ("cat $confpath | grep '^[[:blank:]]*[^[:blank:]#]' | grep ax25-device -c");
 $digiactive = shell_exec ("cat $confpath | grep '^[[:blank:]]*[^[:blank:]#]' | grep '<digipeater>' -c");
 
+//include custom info
+if(file_exists('custom.php')) include 'custom.php';
+
 if($lang == "en")
 {
 	echo "<br><b>Number of frames in log: </b>".($rx + $tx + $is + $other);
@@ -342,193 +235,272 @@ if($lang == "en")
 	}
 	?>
 
-	<br>
-<br><b>Show:</b> <a href="frames.php">Show RAW frames from specified station</a> - <a href="details.php">Show details of a specified station</a>
+
 <br><br><hr><br>
 
-<html>
-<head>
-  <meta content="text/html; charset=ISO-8859-1"
- http-equiv="content-type">
-  <title></title>
-</head>
-<body>
-<table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td align="center">
-<table style="text-align: left; height: 116px; width: 500px;" border="1" cellpadding="2" cellspacing="2">
+<!-- <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+  <tbody> 
+    <tr> 
+      <td align="center"> -->
+<table style="text-align: left; height: 116px; width: 600px;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr align="center">
-      <td style="width: 566px;" colspan="2" rowspan="1"><span
+      <td bgcolor="#ffd700" style="width: 600px;" colspan="2" rowspan="1"><span
       style="color: red; font-weight: bold;">SYSTEM STATUS</span></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>System Version: </b></td>
-      <td style="width: 566px;"><?php echo $sysver ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>System Version: </b></td>
+      <td style="width: 400px;"><?php echo $sysver ?></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>Kernel Version: </b></td>
-      <td style="width: 566px;"><?php echo $kernelver ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>Kernel Version: </b></td>
+      <td style="width: 400px;"><?php echo $kernelver ?></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>APRX Version: </b></td>
-      <td style="width: 566px;"><?php echo $aprxver ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>APRX Version: </b></td>
+      <td style="width: 400px;"><?php echo $aprxver ?></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>System uptime: </b></td>
-      <td style="width: 566px;"><?php echo $uptime ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>System uptime: </b></td>
+      <td style="width: 400px;"><?php echo $uptime ?></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>CPU temperature:</b></td>
-      <td style="width: 566px;"><?php echo $cputemp ?> °C </td>
+      <td bgcolor="silver" style="width: 200px;"><b>CPU temperature:</b></td>
+      <td style="width: 400px;"><?php echo $cputemp ?> °C </td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>CPU frequency: </b></td>
-      <td style="width: 566px;"><?php echo $cpufreq ?> MHz </td>
+      <td bgcolor="silver" style="width: 200px;"><b>CPU frequency: </b></td>
+      <td style="width: 400px;"><?php echo $cpufreq ?> MHz </td>
     </tr>
  </tbody>
 </table>
 <br>
-</body>
-</td>
+<br>
+<!-- </td> -->
 
-<body>
-<td align="center">
-<table style="text-align: left; height: 116px; width: 500px;" border="1" cellpadding="2" cellspacing="2">
+
+
+<table style="text-align: left; height: 116px; width: 600px;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr align="center">
-      <td style="width: 566px;" colspan="2" rowspan="1"><span style="color: red; font-weight: bold;">APRX CONFIG PARAMETERS</span></td>
+      <td bgcolor="#ffd700" style="width: 600px;" colspan="2" rowspan="1"><span style="color: red; font-weight: bold;">APRX CONFIG PARAMETERS</span></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>Beacon Interval: </b></td>
-      <td style="width: 566px;"><?php echo $cyclesize ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>Beacon Interval: </b></td>
+      <td style="width: 400px;"><?php echo $cyclesize ?></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>APRS-IS server: </b></td>
-      <td style="width: 566px;"><?php echo $server ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>APRS-IS server: </b></td>
+      <td style="width: 400px;"><?php echo $server ?></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>Location: </b></td>
-      <td style="width: 566px;"><?php echo $myloc ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>Location: </b></td>
+      <td style="width: 400px;"><?php echo $myloc ?></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>TX active? </b></td>
-      <td style="width: 566px;"><?php echo $txactive ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>TX active? </b></td>
+      <td style="width: 400px;"><?php echo $txactive ?></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>Number of radio ports:</b></td>
-      <td style="width: 566px;"><?php echo $numradioint ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>Number of radio ports:</b></td>
+      <td style="width: 400px;"><?php echo $numradioint ?></td>
     </tr>
     <tr>
-      <td style="width: 168px;"><b>Digipeater active? </b></td>
-      <td style="width: 566px;"><?php if ($digiactive == 1) echo "true" ?></td>
+      <td bgcolor="silver" style="width: 200px;"><b>Digipeater active? </b></td>
+      <td style="width: 400px;"><?php if ($digiactive == 1) echo "true" ?></td>
     </tr>
  </tbody>
 </table>
 <br>
-</body>
-</td>
+<!-- </td>
 </tr>
   </tbody>
-</table>
+</table> -->
 
-</html>
 <br><hr>
 
-	<br><br> <form action="summary.php" method="get">
+	<br><br> <form action="summary.php" method="GET">
 	Show stations since last: 
 	<select name="time">
-	<option value="1" <?php if($_GET['time'] == 1) echo 'selected=\"selected\"'?>>1 hour</option>
-	<option value="2" <?php if($_GET['time'] == 2) echo 'selected=\"selected\"'?>>2 hours</option>
-	<option value="4" <?php if($_GET['time'] == 4) echo 'selected=\"selected\"'?>>4 hours</option>
-	<option value="6" <?php if($_GET['time'] == 6) echo 'selected=\"selected\"'?>>6 hours</option>
-	<option value="12" <?php if($_GET['time'] == 12) echo 'selected=\"selected\"'?>>12 hours</option>
-	<option value="24" <?php if($_GET['time'] == 24) echo 'selected=\"selected\"'?>>1 day</option>
-	<option value="48" <?php if($_GET['time'] == 48) echo 'selected=\"selected\"'?>>2 days</option>
-	<option value="168" <?php if($_GET['time'] == 168) echo 'selected=\"selected\"'?>>week</option>
-	<option value="720" <?php if($_GET['time'] == 720) echo 'selected=\"selected\"'?>>30 days</option>
-	<option value="e" <?php if($_GET['time'] == 'e') echo 'selected=\"selected\"'?>>all</option>
+	<option value="1" <?php if(isset($_GET['time'])&&($_GET['time'] == 1)) echo 'selected="selected"'?>>1 hour</option>
+	<option value="2" <?php if(isset($_GET['time'])&&($_GET['time'] == 2)) echo 'selected="selected"'?>>2 hours</option>
+	<option value="4" <?php if(isset($_GET['time'])&&($_GET['time'] == 4)) echo 'selected="selected"'?>>4 hours</option>
+	<option value="6" <?php if(isset($_GET['time'])&&($_GET['time'] == 6)) echo 'selected="selected"'?>>6 hours</option>
+	<option value="12" <?php if(isset($_GET['time'])&&($_GET['time'] == 12)) echo 'selected="selected"'?>>12 hours</option>
+	<option value="24" <?php if(isset($_GET['time'])&&($_GET['time'] == 24)) echo 'selected="selected"'?>>1 day</option>
+	<option value="48" <?php if(isset($_GET['time'])&&($_GET['time'] == 48)) echo 'selected="selected"'?>>2 days</option>
+	<option value="168" <?php if(isset($_GET['time'])&&($_GET['time'] == 168)) echo 'selected="selected"'?>>week</option>
+	<option value="720" <?php if(isset($_GET['time'])&&($_GET['time'] == 720)) echo 'selected="selected"'?>>30 days</option>
+	<option value="e" <?php if(isset($_GET['time'])&&($_GET['time'] == 'e')) echo 'selected="selected"'?>>all</option>
 </select>
 <input type="submit" value="Refresh">
 	<?php
-	echo "<br><br><b>Stations received on radio (including $unique[1] unique stations):</b><br>";
-	echo "<br><pre><font color=\"blue\"><b>Callsign&nbsp;&nbsp;&nbsp;&nbsp;Points</b></font><br>";
+	echo "<br><br><b>Stations received on radio (including $unique[1] unique stations):</b><br><br>";
+	?>
+	<table style="text-align: left; height: 116px; width: 600px;" border="1">
+	<tbody>
+	<tr>
+	<td bgcolor="#ffd700"><b><font color="blue">Callsign</font></b></td>
+	<td bgcolor="#ffd700"><b><font color="blue">Points</font></b></td>
+	<td bgcolor="#ffd700"><b><font color="blue">Map show</font></b></td>
+        <td bgcolor="#ffd700"><b><font color="blue">Raw packet</font></b></td>
+	<td bgcolor="#ffd700"><b><font color="blue">Details</font></b></td>
+	</tr>
+	<?php
 	while(list($c, $nm) = each($receivedstations))
 	{
-//		echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">'.$c.'</a>'; //callsign
-		echo $c;
-		$spaces = 12 - strlen($c);
-		for($i = 0; $i < $spaces; $i++) 
-		{
-			echo '&nbsp;';
-		}
-		echo $nm;
-		$spaces = 8 - strlen($nm);
-                for($i = 0; $i < $spaces; $i++)
-                {
-                        echo '&nbsp;';
-                }
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">Show on aprs.fi</a>';
-		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-		echo '<a target="_blank" href="frames.php?getcall='.$c.'">Show RAW Packets</a>';
-		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-		echo '<a target="_blank" href="details.php?getcall='.$c.'">Show station details</a>';
-		echo '<br>';
+	?>
+	<tr>
+		<td bgcolor="silver"><b><?php echo $c ?></b></td>
+		<td align="center"><?php echo $nm ?></td>
+		<td><?php echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">Show on aprs.fi</a>'?></td>
+		<td><?php echo '<a target="_blank" href="frames.php?getcall='.$c.'">Show RAW Packets</a>'?></td>
+		<td><?php echo '<a target="_blank" href="details.php?getcall='.$c.'">Show station details</a>' ?></td>
+	</tr>
+	<?php
 	}
-} else {
-	echo "<b>Czas działania systemu: </b>".$uptime;
-	echo "<br><b>Temperatura CPU: </b>".$cputemp." °C";
-	echo "<br><b>Częstotliwość CPU: </b>".$cpufreq." MHz";
-	echo "<br><b>Wszystkich ramek w logu: </b>".($rx + $tx + $other + $is);
-	echo "<br><b>Ramek odebranych przez sieć radiową: </b>".$rx;
-	echo "<br><b>Ramek nadanych przez sieć radiową: </b>".$tx;
-	echo "<br><b>Ramek odebranych z APRS-IS: </b>".$is;
+	?>
+	</tbody>
+        </table>
+	<?php
+} else { //polish
+	echo "<br><b>Liczba ramek w logu: </b>".($rx + $tx + $is + $other);
+	echo "<br><b>Liczba ramek odebranych przez radio: </b>".$rx;
+	echo "<br><b>Liczba ramek nadanych przez radio: </b>".$tx;
+	echo "<br><b>Liczba ramek odebranych z APRS-IS: </b>".$is;
 	if($logfile[$lines - 20] > 0)
 	{
 		load($logfile[$lines - 21], 0);
 		load($logfile[$lines - 1], 1);
-		echo "<br><b>Obciążenie (ostatnie 20 ramek): </b>".number_format($framespermin, 2, '.', ',')." ramek/min";
+		echo "<br><b>Obciążenie (ostatenie 20 ramek): </b>".number_format($framespermin, 2, '.', ',')." ramek/min";
 	}
 	?>
-	<br>
-<br><b>Pokaż:</b> <a href="summary.php">Podsumowanie i odebrane stacje</a> - <a href="stations.php">Informacje o stacjach</a> - <a href="frames.php">Pokaż ramki wybranej stacji</a> - <a href="details.php">Pokaż szczegóły wybranej stacji</a>
-	<br><br><hr>
-	<br><br> <form action="summary.php" method="get">
-	Pokaż stacje z czasu: 
+
+<br><br><hr><br>
+
+<!-- <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+  <tbody> 
+    <tr> 
+      <td align="center"> -->
+<table style="text-align: left; height: 116px; width: 600px;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr align="center">
+      <td bgcolor="#ffd700" style="width: 600px;" colspan="2" rowspan="1"><span
+      style="color: red; font-weight: bold;">STATUS SYSTEMU</span></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Wersja systemu: </b></td>
+      <td style="width: 400px;"><?php echo $sysver ?></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Wersja jądra: </b></td>
+      <td style="width: 400px;"><?php echo $kernelver ?></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Wersja APRX: </b></td>
+      <td style="width: 400px;"><?php echo $aprxver ?></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Czas działania: </b></td>
+      <td style="width: 400px;"><?php echo $uptime ?></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Temperatura CPU:</b></td>
+      <td style="width: 400px;"><?php echo $cputemp ?> °C </td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Częstotliwość CPU: </b></td>
+      <td style="width: 400px;"><?php echo $cpufreq ?> MHz </td>
+    </tr>
+ </tbody>
+</table>
+<br>
+<br>
+<!-- </td> -->
+
+<table style="text-align: left; height: 116px; width: 600px;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr align="center">
+      <td bgcolor="#ffd700" style="width: 600px;" colspan="2" rowspan="1"><span style="color: red; font-weight: bold;">KONFIGURACJA APRX</span></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Interwał beaconów: </b></td>
+      <td style="width: 400px;"><?php echo $cyclesize ?></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Serwer APRS-IS: </b></td>
+      <td style="width: 400px;"><?php echo $server ?></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Lokalizacja: </b></td>
+      <td style="width: 400px;"><?php echo $myloc ?></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Nadawanie aktywne? </b></td>
+      <td style="width: 400px;"><?php echo $txactive ?></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Liczba portów radiowych:</b></td>
+      <td style="width: 400px;"><?php echo $numradioint ?></td>
+    </tr>
+    <tr>
+      <td bgcolor="silver" style="width: 200px;"><b>Digipeater włączony? </b></td>
+      <td style="width: 400px;"><?php if ($digiactive == 1) echo "true" ?></td>
+    </tr>
+ </tbody>
+</table>
+<br>
+<!-- </td>
+</tr>
+  </tbody>
+</table> -->
+
+<br><hr>
+
+	<br><br> <form action="summary.php" method="GET">
+	Pokaż stacje z ostatnich: 
 	<select name="time">
-	<option value="1" <?php if($_GET['time'] == 1) echo 'selected=\"selected\"'?>>1 godziny</option>
-	<option value="2" <?php if($_GET['time'] == 2) echo 'selected=\"selected\"'?>>2 godzin</option>
-	<option value="4" <?php if($_GET['time'] == 4) echo 'selected=\"selected\"'?>>4 godzin</option>
-	<option value="6" <?php if($_GET['time'] == 6) echo 'selected=\"selected\"'?>>6 godzin</option>
-	<option value="12" <?php if($_GET['time'] == 12) echo 'selected=\"selected\"'?>>12 godzin</option>
-	<option value="24" <?php if($_GET['time'] == 24) echo 'selected=\"selected\"'?>>1 dnia</option>
-	<option value="48" <?php if($_GET['time'] == 48) echo 'selected=\"selected\"'?>>2 dni</option>
-	<option value="168" <?php if($_GET['time'] == 168) echo 'selected=\"selected\"'?>>tygodnia</option>
-	<option value="720" <?php if($_GET['time'] == 720) echo 'selected=\"selected\"'?>>30 dni</option>
-	<option value="e" <?php if($_GET['time'] == 'e') echo 'selected=\"selected\"'?>>wszystko</option>
-	</select>
-	<input type="submit" value="Odśwież">
+	<option value="1" <?php if(isset($_GET['time'])&&($_GET['time'] == 1)) echo 'selected=\"selected\"'?>>1 godziny</option>
+	<option value="2" <?php if(isset($_GET['time'])&&($_GET['time'] == 2)) echo 'selected=\"selected\"'?>>2 godzin</option>
+	<option value="4" <?php if(isset($_GET['time'])&&($_GET['time'] == 4)) echo 'selected=\"selected\"'?>>4 godzin</option>
+	<option value="6" <?php if(isset($_GET['time'])&&($_GET['time'] == 6)) echo 'selected=\"selected\"'?>>6 godzin</option>
+	<option value="12" <?php if(isset($_GET['time'])&&($_GET['time'] == 12)) echo 'selected=\"selected\"'?>>12 godzin</option>
+	<option value="24" <?php if(isset($_GET['time'])&&($_GET['time'] == 24)) echo 'selected=\"selected\"'?>>1 dnia</option>
+	<option value="48" <?php if(isset($_GET['time'])&&($_GET['time'] == 48)) echo 'selected=\"selected\"'?>>2 dni</option>
+	<option value="168" <?php if(isset($_GET['time'])&&($_GET['time'] == 168)) echo 'selected=\"selected\"'?>>tygodnia</option>
+	<option value="720" <?php if(isset($_GET['time'])&&($_GET['time'] == 720)) echo 'selected=\"selected\"'?>>30 dni</option>
+	<option value="e" <?php if(isset($_GET['time'])&&($_GET['time'] == 'e')) echo 'selected=\"selected\"'?>>wszystkie</option>
+</select>
+<input type="submit" value="Refresh">
 	<?php
-	echo "<br><br><b>Stacje odebrane drogą radiową (w tym $unique[1] unikalnych):</b><br>";
-	echo "<br><pre><font color=\"blue\"><b>Znak\t&nbsp;&nbsp;&nbsp;&nbsp;Punkty</b></font><br>";
+	echo "<br><br><b>Stacje odebrane przez radio (zawiera $unique[1] unikatowych stacji):</b><br><br>";
+	?>
+	<table style="text-align: left; height: 116px; width: 600px;" border="1">
+	<tbody>
+	<tr>
+	<td bgcolor="#ffd700"><b><font color="blue">Znak</font></b></td>
+	<td bgcolor="#ffd700"><b><font color="blue">Punkty</font></b></td>
+	<td bgcolor="#ffd700"><b><font color="blue">Pokaż na mapie</font></b></td>
+        <td bgcolor="#ffd700"><b><font color="blue">Surowe pakiety</font></b></td>
+	<td bgcolor="#ffd700"><b><font color="blue">Szczegóły</font></b></td>
+	</tr>
+	<?php
 	while(list($c, $nm) = each($receivedstations))
 	{
-//		echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">'.$c.'</a>'; //callsign
-		$spaces = 12 - strlen($c);
-		for($i = 0; $i < $spaces; $i++) 
-		{
-			echo '&nbsp;';
-		}
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">Show on aprs.fi</a>';
-		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-		echo '<a target="_blank" href="frames.php?getcall='.$c.'">Show RAW Packets</a>';
-		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-		echo '<a target="_blank" href="details.php?getcall='.$c.'">Show station details</a>';
-		echo '<br>';
-		echo $nm;
-		echo '<br>';
+	?>
+	<tr>
+		<td bgcolor="silver"><b><?php echo $c ?></b></td>
+		<td align="center"><?php echo $nm ?></td>
+		<td><?php echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">Pokaż na aprs.fi</a>'?></td>
+		<td><?php echo '<a target="_blank" href="frames.php?getcall='.$c.'">Pokaż surowe pakiety</a>'?></td>
+		<td><?php echo '<a target="_blank" href="details.php?getcall='.$c.'">Pokaż szczegółby stacji</a>' ?></td>
+	</tr>
+	<?php
 	}
+	?>
+	</tbody>
+        </table>
+	<?php
 }
 
 asort($movingstations); //sort
@@ -594,7 +566,6 @@ if($lang == "en")
 }
 
 ?>
-</pre>
 <br><hr><br>
 <center><a href="https://github.com/sq8vps/aprx-simplewebstat" target="_blank">APRX Simple Webstat version <?php echo $asw_version; ?></a> by Peter SQ8VPS and Alfredo IZ7BOJ</center>
 <br>
