@@ -44,9 +44,13 @@ Set $static_if to 1 to enable. Available languages are en for English and pl for
 ## Customization
 
 Custom logo and text info can be set optionally. The logo will be displayed on all pages and text info will be displayed only on main (summary.php) page.
-To set your logo you need to place a file (PNG format) named **aprslogo.png** in main website directory. The image will be automatically resized to fit the page.
+To set the logo you have to provide the URL/address of the image:
+```
+$logourl="aprslogo.png";
+```
+That can be a link to an external or local file. The image will be automatically resized to fit the page.
 
-To set your custom text info place them in the file named **custom.php**. It can contain HTML and PHP code.
+To set your custom text info place that info in a file named **custom.php**. It can contain HTML and PHP code.
 
 ## Software stability
 
