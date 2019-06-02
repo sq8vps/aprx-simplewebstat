@@ -41,7 +41,6 @@ $static_lang = "en";
 ```
 Set $static_if to 1 to enable. Available languages are en for English and pl for Polish.
 
-## Customization
 
 Custom logo and text info can be set optionally. The logo will be displayed on all pages and text info will be displayed only on main (summary.php) page.
 To set the logo you have to provide the URL/address of the image:
