@@ -407,4 +407,69 @@ function frameparse($frame)
 
 }
 
+//function for load calc
+
+function rxload() {
+global $logfile;
+global $callraw;
+global $lines;
+global $rxframespermin;
+
+$count=0;
+$index1=1;
+//find the time of last rx packet in log
+while (($index1<$lines)AND(!((strpos($logfile[$lines - $index1],$callraw." R"))OR(strpos($logfile[$lines - $index1],$callraw." d"))))) {
+        $index1++;
+        }
+$time1 = strtotime(substr($logfile[$lines - $index1], 0, 19));
+$index2=$index1+1;
+
+//go back to last-20  received packets and take time
+while (($index2<$lines)AND($count<19)) {
+        if((strpos($logfile[$lines - $index2],$callraw." R"))OR(strpos($logfile[$lines - $index2],$callraw." d"))) {
+                $time2 = strtotime(substr($logfile[$lines - $index2], 0, 19));
+                $count++;
+                }
+        $index2++;
+}
+$rxframespermin = $count / (($time1 - $time2) / 60);
+//echo $count."<br>";//debug line
+//echo $index1."<br>";//debug line
+//echo $index2."<br>";//debug line
+return(rxframespermin);
+}
+
+//maybe it's possible to merge these two functions...
+
+function txload() {
+global $logfile;
+global $callraw;
+global $lines;
+global $txframespermin;
+
+$count=0;
+$index1=1;
+//find the time of last tx packet in log
+while (($index1<$lines)AND(!(strpos($logfile[$lines - $index1],$callraw." T")))) {
+        $index1++;
+        }
+$time1 = strtotime(substr($logfile[$lines - $index1], 0, 19));
+
+$index2=$index1+1;
+
+//go back to last-20  tx packets and take time
+while (($index2<$lines)AND($count<19)) {
+        if(strpos($logfile[$lines - $index2],$callraw." T")) {
+                $time2 = strtotime(substr($logfile[$lines - $index2], 0, 19));
+                $count++;
+                }
+        $index2++;
+}
+$txframespermin = $count / (($time1 - $time2) / 60);
+//echo $count."<br>"; // debug line
+//echo $index1."<br>"; //debug line
+//echo $index2."<br>"; //debug line
+return(txframespermin);
+}
+
 ?>
