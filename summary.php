@@ -124,7 +124,7 @@ $linesinlog = count($logfile);
 while ($lines < $linesinlog) { //read line by line
     $line = $logfile[$lines];
 	stationparse($line);
-	if(strpos($line, $callraw." R") !== false) { //if it's the frame received by radio
+	if((strpos($line, $callraw." R") !== false)OR(strpos($line, $callraw." d") !== false)) { //if it's the frame received by radio
 		$rx++;
 	} elseif(strpos($line, "APRSIS    R") !== false) //if it's from aprs-is
 	{
@@ -227,12 +227,17 @@ if($lang == "en")
 	echo "<br><b>Number of frames received on radio: </b>".$rx;
 	echo "<br><b>Number of frames transmitted on radio: </b>".$tx;
 	echo "<br><b>Number of frames received from APRS-IS: </b>".$is;
-	if($logfile[$lines - 20] > 0)
+/*	if($logfile[$lines - 20] > 0)
 	{
 		load($logfile[$lines - 21], 0);
 		load($logfile[$lines - 1], 1);
 		echo "<br><b>Load (last 20 frames): </b>".number_format($framespermin, 2, '.', ',')." frames/min";
 	}
+*/
+rxload();
+echo "<br><b>RX Load (last 20 frames): </b>".number_format($rxframespermin, 2, '.', ',')." frames/min";
+txload();
+echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '.', ',')." frames/min";
 	?>
 
 
