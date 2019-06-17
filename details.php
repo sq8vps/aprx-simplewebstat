@@ -1,14 +1,15 @@
-﻿<?php
+<?php
 /******************************************************************************************
 This file is a part of SIMPLE WEB STATICSTICS GENERATOR FROM APRX LOG FILE
 It's very simple and small APRX statictics generator in PHP. It's parted to smaller files and they will work independent from each other (but you always need chgif.php).
 This script may have a lot of bugs, problems and it's written in very non-efficient way without a lot of good programming rules. But it works for me.
 Author: Peter SQ8VPS, sq8vps[--at--]gmail.com & Alfredo IZ7BOJ
-You can modify this program, but please give a credit to original author. Program is free for non-commercial use only.
+You can modify this program, but please give a credit to original authors. Program is free for non-commercial use only.
 (C) Peter SQ8VPS & Alfredo IZ7BOJ 2017-2018
 
-Version 1.2.1beta
+Version 1.3.1beta
 *******************************************************************************************/
+
 include 'config.php';
 include 'common.php';
 include 'functions.php';
@@ -55,7 +56,7 @@ $mice = 0;
 $declat = 0;
 $declon = 0;
 
-
+$tocall = "";
 
 if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 {
@@ -68,7 +69,7 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 		frameparse($line);
 		$lines--;
 	}
-	
+device();	
 }
 
 if($lang == "en")
@@ -106,7 +107,6 @@ Show details of station: <input type="text" name="getcall" <?php if(isset($_GET[
 <br>
 
 <?php
-
 if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 {
 	if(($posframefound == 0) && ($otherframefound == 0))
@@ -120,8 +120,8 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 		echo '<b>Frames heard: </b>'.$noofframes;
 		if($posframefound) 
 		{			
-			echo '<br><br><font color="blue"><b>Last position frame heard:</b> '.$posdate.' '.$postime.' (';
-			$dc = time() - strtotime($posdate.' '.$postime);
+			echo '<br><br><font color="blue"><b>Last position frame heard:</b> '.$posdate.' '.$postime.' GMT (';
+			$dc = time() -date('Z') - strtotime($posdate.' '.$postime);
 			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s ago)</font>';
 			echo '<br><font color="red"><b>Station position: </b>'.$declat.', '.$declon.' - <b>'.$distance.' km '.$bearing.'° from your location</b></font>';
 			echo '<br><font color="green"><b>Frame comment: </b>'.$comment.'</font>';
@@ -129,12 +129,13 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 			if($mice) echo 'Mic-E compressed frame'; else echo 'Uncompressed frame';
 			echo '<br><b>Station symbol:</b> '.$symboltab.$symbol;
 			echo '<br><b>Frame path:</b> '.$scall.'>'.$lastpath;
+			echo '<br><b>Device:</b> '.$device;
 		}
 		
 		if($otherframefound) 
 		{			
 			echo '<br><br><b>Last status frame heard:</b> '.$otherdate.' '.$othertime.' (';
-			$dc = time() - strtotime($otherdate.' '.$othertime);
+			$dc = time() - date('Z') - strtotime($otherdate.' '.$othertime);
 			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s ago)';
 			echo '<br><b>Status: </b>'.$status;
 		}
@@ -199,8 +200,8 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 		echo '<b>Ramek odebranych: </b>'.$noofframes;
 		if($posframefound) 
 		{			
-			echo '<br><br><font color="blue"><b>Ostatnia ramka pozycyjna odebrana:</b> '.$posdate.' '.$postime.' (';
-			$dc = time() - strtotime($posdate.' '.$postime);
+			echo '<br><br><font color="blue"><b>Ostatnia ramka pozycyjna odebrana:</b> '.$posdate.' '.$postime.' GMT (';
+			$dc = time() - date('Z') - strtotime($posdate.' '.$postime);
 			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s temu)</font>';
 			echo '<br><font color="red"><b>Pozycja stacji: </b>'.$declat.', '.$declon.' - <b>'.$distance.' km '.$bearing.'° od twojej lokalizacji</b></font>';
 			echo '<br><font color="green"><b>Komentarz: </b>'.$comment.'</font>';
@@ -208,20 +209,18 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 			if($mice) echo 'Ramka skompresowana Mic-E'; else echo 'Ramka nieskompresowana';
 			echo '<br><b>Symbol stacji:</b> '.$symboltab.$symbol;
 			echo '<br><b>Ścieżka ramki:</b> '.$scall.'>'.$lastpath;
+			echo '<br><b>Device:</b> '.$device;
 		}
 		
 		if($otherframefound) 
 		{			
 			echo '<br><br><b>Ostatnia ramka statusowa odebrana:</b> '.$otherdate.' '.$othertime.' (';
-			$dc = time() - strtotime($otherdate.' '.$othertime);
+			$dc = time() - date('Z') - strtotime($otherdate.' '.$othertime);
 			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s temu)';
 			echo '<br><b>Status: </b>'.$status;
 		}
 		
-		
-	
-	
-	
+
 	
 	}
 
