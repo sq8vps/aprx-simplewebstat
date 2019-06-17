@@ -1,13 +1,13 @@
-﻿<?php
+<?php
 /******************************************************************************************
 This file is a part of SIMPLE WEB STATICSTICS GENERATOR FROM APRX LOG FILE
 It's very simple and small APRX statictics generator in PHP. It's parted to smaller files and they will work independent from each other (but you always need chgif.php).
 This script may have a lot of bugs, problems and it's written in very non-efficient way without a lot of good programming rules. But it works for me.
 Author: Peter SQ8VPS, sq8vps[--at--]gmail.com & Alfredo IZ7BOJ
-You can modify this program, but please give a credit to original author. Program is free for non-commercial use only.
+You can modify this program, but please give a credit to original authors. Program is free for non-commercial use only.
 (C) Peter SQ8VPS & Alfredo IZ7BOJ 2017-2018
 
-Version 1.2.2beta
+Version 1.3.1beta
 *******************************************************************************************/
 ?>
 <?php
@@ -90,7 +90,7 @@ $is = 0;
 $other = 0;
 $receivedstations = array();
 $time = 0;
-$framespermin = 0;
+//$framespermin = 0;
 $time1 = 0;
 $time2 = 0;
 
@@ -137,7 +137,6 @@ while ($lines < $linesinlog) { //read line by line
 		$other++;
 	}
 		$lines++;
-	
 }
 
 $unique = array_count_values($receivedstations);
@@ -174,15 +173,15 @@ if (file_exists ("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")) {
 
 $uptime = shell_exec('uptime -p');
 
-//part for reading from aprx.conf file	
-//will be developed  
-/*	
-$lines2 = 0;	
+//part for reading from aprx.conf file
+//will be developed
+/*
+$lines2 = 0;
 $conffile = file($confpath); //read config file
 $linesinconf = count($conffile); //get number of lines in aprx.conf
 while ($lines2 < $linesinconf) { //read line by line
     $line = $conffile[$lines2];
-	
+
 	$xz = strpos($line, "server ");
 	if($xz !== false)
 	{
@@ -195,11 +194,11 @@ while ($lines2 < $linesinconf) { //read line by line
 				break;
 			} else if($line[$cc] == "#") break;
 		}
-		
+
 	}
-	
+
 	$lines2++;
-	
+
 }
 */
 
@@ -244,8 +243,8 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 <br><br><hr><br>
 
 <!-- <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
-  <tbody> 
-    <tr> 
+  <tbody>
+    <tr>
       <td align="center"> -->
 <table style="text-align: left; height: 116px; width: 600px;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
@@ -325,7 +324,7 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 <br><hr>
 
 	<br><br> <form action="summary.php" method="GET">
-	Show stations since last: 
+	Show stations since last:
 	<select name="time">
 	<option value="1" <?php if(isset($_GET['time'])&&($_GET['time'] == 1)) echo 'selected="selected"'?>>1 hour</option>
 	<option value="2" <?php if(isset($_GET['time'])&&($_GET['time'] == 2)) echo 'selected="selected"'?>>2 hours</option>
@@ -340,7 +339,7 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 </select>
 <input type="submit" value="Refresh">
 	<?php
-	echo "<br><br><b>Stations received on radio (including $unique[1] unique stations):</b><br><br>";
+	echo "<br><br><b>".count($receivedstations)." Stations received on radio (including $unique[1] unique stations):</b><br><br>";
 	?>
 	<table style="text-align: left; height: 116px; width: 600px;" border="1">
 	<tbody>
@@ -384,8 +383,8 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 <br><br><hr><br>
 
 <!-- <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
-  <tbody> 
-    <tr> 
+  <tbody>
+    <tr>
       <td align="center"> -->
 <table style="text-align: left; height: 116px; width: 600px;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
@@ -463,7 +462,7 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 <br><hr>
 
 	<br><br> <form action="summary.php" method="GET">
-	Pokaż stacje z ostatnich: 
+	Pokaż stacje z ostatnich:
 	<select name="time">
 	<option value="1" <?php if(isset($_GET['time'])&&($_GET['time'] == 1)) echo 'selected=\"selected\"'?>>1 godziny</option>
 	<option value="2" <?php if(isset($_GET['time'])&&($_GET['time'] == 2)) echo 'selected=\"selected\"'?>>2 godzin</option>
@@ -478,7 +477,7 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 </select>
 <input type="submit" value="Refresh">
 	<?php
-	echo "<br><br><b>Stacje odebrane przez radio (zawiera $unique[1] unikatowych stacji):</b><br><br>";
+	echo "<br><br><b>".count($receivedstations)." Stacje odebrane przez radio (zawiera $unique[1] unikatowych stacji):</b><br><br>";
 	?>
 	<table style="text-align: left; height: 116px; width: 600px;" border="1">
 	<tbody>
@@ -515,7 +514,7 @@ asort($viastations);
 asort($directstations);
 
 if($lang == "en")
-{	
+{
 	echo "<br><br><hr /><br><font color=\"blue\"><b>Moving stations (<u>".count($movingstations)."</u>):</b></font> ";
 	while(list($u, $o) = each($movingstations))
 	{
