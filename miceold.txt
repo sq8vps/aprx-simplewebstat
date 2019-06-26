@@ -1,0 +1,5 @@
+>   Kenwood TH-D7A
+> = Kenwood TH-D72
+> ^ Kenwood TH-D74
+]   Kenwood TM-D700
+] = Kenwood TM-D710
