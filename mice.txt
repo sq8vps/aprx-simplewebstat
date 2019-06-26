@@ -1,0 +1,11 @@
+_  Yaesu VX-8
+_" Yaesu FTM-350
+_# Yaesu VX-8G
+_$ Yaesu FT1D
+_( Yaesu FT2D
+_) Yaesu FTM-100D
+_% Yaesu FTM-400DR
+|3 Byonics TinyTrak3
+|4 Byonics TinyTrak4
+^v HinzTec anyfrog
+*v KissOZ Tracker
