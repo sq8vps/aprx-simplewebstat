@@ -50,6 +50,8 @@ if(file_exists($logourl)){
 <h2>for interface <font color="red"><b><?php echo $call; ?></b></font> - summary</h2> <a href="chgif.php?chgif=1">Change interface</a>
 <br>
 <br><b>Show:</b> <a href="summary.php">Summary (main)</a> - <a href="frames.php">RAW frames from specified station</a> - <a href="details.php">Details of a specified station</a><br><br>
+<button onclick="window.open('live.php')">Watch AX25 Realtime traffic !</button>
+<br><br>
 <hr>
 </center>
 <br>
