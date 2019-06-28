@@ -472,4 +472,127 @@ $txframespermin = $count / (($time1 - $time2) / 60);
 return(txframespermin);
 }
 
+function device() {
+	global $mice;
+	global $comment;
+	global $lastpath;
+	global $device;
+
+	$tocall = substr($lastpath,0,strpos($lastpath,",")); //cut destination call from lastpath
+	if ($mice==0) {
+
+	//standard device parsing
+	$tocfile = file("./tocalls.txt"); //read log file
+	$linesintocfile = count($tocfile);
+	$match=0;
+	$w=0; //number of wildcards. Try exact match first
+	while (($match!==1)AND($w<=strlen($tocall)-3)){ //3 wildcards for 6characters tocall, 2wilds for 5characters and 1wild for 4character
+		$toclines=0;
+		$tocall2=substr($tocall,0,strlen($tocall)-$w); //start without wilds, then replace last part with wilds
+				while ($toclines < $linesintocfile) {
+						$tocline=$tocfile[$toclines];
+						$toc = substr($tocline,6,strpos(substr($tocline,6),"  "));//cut tocall from file line
+						//compare destination call + wilds with all file lines. Wildcards can be "n","x","y"
+						if((strpos($toc, $tocall2.str_repeat("x",$w)) !== false)OR(strpos($toc, $tocall2.str_repeat("n",$w)!== false))OR(strpos($toc, $tocall2.str_repeat("y",$w)) !== false)) {								$match=1;
+								break; //exit of match
+								}
+						$toclines++; //otherwise go to next file line
+						}
+		$w++;
+		}
+	if ($match==1) {
+		if (strpos($tocall,"APRX")!== 0) { //special case for APRX
+			$device=substr($tocline, 14, strlen($tocline)-14);//if it's not aprx, print device description contained in the file
+		}
+		else {
+				if(substr($tocall,4,2)>40) {
+				$device="APRSMax";
+				}
+				else {
+				$device="APRX".substr($tocall,4,1).".".substr($tocall,5,1);
+				}
+
+		}
+	}
+
+
+	//check special cases at the end (wildcards in the middle of tocall)
+	if (substr($tocall,0,2).substr($tocall,5,1)=="APD") {
+		$device="Painter Engineering uSmartDigi D-Gate DSTAR Gateway";
+		$match=1;
+		}
+	if (substr($tocall,0,2).substr($tocall,5,1)=="APU") {
+		$device="Painter Engineering uSmartDigi D-Gate Digipeater";
+		$match=1;
+		}
+	if ($match==0) {
+		$device="Unknown";
+		}
+
+	}// close non mic-e
+	else  {
+	// mice non legacy
+	$micefile = file("./mice.txt"); //read log file
+	$linesinmicefile = count($micefile);
+	$match=0;
+	$micelines=0;
+
+	$micesymbol=substr($comment,strlen($comment)-3,2); // last character is space, must be deleted
+	while ($micelines < $linesinmicefile) { //read line by line
+					$miceline = $micefile[$micelines];
+					if (strpos(substr($miceline,0,2), $micesymbol)!==false) {
+							$match=1;
+							break;
+							}
+					$micelines++;
+					}
+
+	if ($match==1) {
+			$device=(substr($miceline, 3, strlen($miceline)-3));
+			}
+	else {
+			// mice legacy
+
+			$miceoldfile = file("./miceold.txt"); //read log file
+			$linesinmiceoldfile = count($miceoldfile);
+			$match=0;
+			$miceoldlines=0;
+			$miceold1=substr($comment,0,1);
+			$miceold2=substr($comment,strlen($comment)-2,1);
+
+			//match exact
+			while ($miceoldlines < $linesinmiceoldfile) { //read line by line
+							$miceoldline = $miceoldfile[$miceoldlines];
+									if ((strpos(substr($miceoldline,0,1), $miceold1)!==false)AND(strpos(substr($miceoldline,2,1), $miceold2)!==false)) {
+									$match=1;
+									break;
+									}
+							$miceoldlines++;
+							}
+
+			if ($match==0){
+
+			// match 1st char
+			$miceoldlines=0;
+			while ($miceoldlines < $linesinmiceoldfile) { //read line by line
+							$miceoldline = $miceoldfile[$miceoldlines];
+							if ((strpos(substr($miceoldline,0,1), $miceold1)!==false)) {
+									$match=1;
+									break;
+									}
+							$miceoldlines++;
+							}
+			}
+
+			if ($match==1) {
+					$device=(substr($miceoldline, 4, strlen($miceoldline)-4));
+					}
+			else {
+			$device="Unknown";
+			}
+
+		}// close mic-e legacy
+	}//close mic-e non legacy
+} //close function
+
 ?>
