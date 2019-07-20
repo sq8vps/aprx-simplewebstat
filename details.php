@@ -4,10 +4,9 @@ This file is a part of SIMPLE WEB STATICSTICS GENERATOR FROM APRX LOG FILE
 It's very simple and small APRX statictics generator in PHP. It's parted to smaller files and they will work independent from each other (but you always need chgif.php).
 This script may have a lot of bugs, problems and it's written in very non-efficient way without a lot of good programming rules. But it works for me.
 Author: Peter SQ8VPS, sq8vps[--at--]gmail.com & Alfredo IZ7BOJ
-You can modify this program, but please give a credit to original authors. Program is free for non-commercial use only.
+You can modify this program, but please give a credit to original author. Program is free for non-commercial use only.
 (C) Peter SQ8VPS & Alfredo IZ7BOJ 2017-2018
 
-Version 1.3.1beta
 *******************************************************************************************/
 
 include 'config.php';
@@ -66,10 +65,12 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 	$lines = $linesinlog - 1;
 	while ($lines > 0) { //read line by line but starting from the newest frame!
 		$line = $logfile[$lines];
+		if((strpos($line, $callraw." R ")!== false)OR(strpos($line, $callraw." d ")!== false)) {
 		frameparse($line);
+		}
 		$lines--;
 	}
-device();	
+device();
 }
 
 if($lang == "en")
@@ -117,9 +118,9 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 	{
 		echo '<b><font color="blue" size="8">'.$scall.'</font></b>';
 		echo '<br><a href="https://aprs.fi/?call='.$scall.'" target="_blank">Show on aprs.fi</a><br><br>';
-		echo '<b>Frames heard: </b>'.$noofframes;
-		if($posframefound) 
-		{			
+		echo '<b>Frames heard:</b><a href="frames.php?getcall='.$_GET['getcall'].'" target="_blank">'.$noofframes.'</a><br>';
+		if($posframefound)
+		{
 			echo '<br><br><font color="blue"><b>Last position frame heard:</b> '.$posdate.' '.$postime.' GMT (';
 			$dc = time() -date('Z') - strtotime($posdate.' '.$postime);
 			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s ago)</font>';
@@ -131,23 +132,18 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 			echo '<br><b>Frame path:</b> '.$scall.'>'.$lastpath;
 			echo '<br><b>Device:</b> '.$device;
 		}
-		
-		if($otherframefound) 
-		{			
+
+		if($otherframefound)
+		{
 			echo '<br><br><b>Last status frame heard:</b> '.$otherdate.' '.$othertime.' (';
-			$dc = time() - date('Z') - strtotime($otherdate.' '.$othertime);
+			$dc = time() - strtotime($otherdate.' '.$othertime);
 			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s ago)';
 			echo '<br><b>Status: </b>'.$status;
 		}
-		
-		
-	
-	
-	
-	
+
 	}
 
-} 
+}
 
 }else {
 ?>
@@ -197,9 +193,10 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 	{
 		echo '<b><font color="blue" size="8">'.$scall.'</font></b>';
 		echo '<br><a href="https://aprs.fi/?call='.$scall.'" target="_blank">Pokaż na aprs.fi</a><br><br>';
-		echo '<b>Ramek odebranych: </b>'.$noofframes;
-		if($posframefound) 
-		{			
+		echo '<b>Ramek odebranych: </b><a href="frames.php?getcall='.$_GET['getcall'].'" target="_blank">'.$noofframes.'</a><br>';
+
+		if($posframefound)
+		{
 			echo '<br><br><font color="blue"><b>Ostatnia ramka pozycyjna odebrana:</b> '.$posdate.' '.$postime.' GMT (';
 			$dc = time() - date('Z') - strtotime($posdate.' '.$postime);
 			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s temu)</font>';
@@ -209,22 +206,20 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 			if($mice) echo 'Ramka skompresowana Mic-E'; else echo 'Ramka nieskompresowana';
 			echo '<br><b>Symbol stacji:</b> '.$symboltab.$symbol;
 			echo '<br><b>Ścieżka ramki:</b> '.$scall.'>'.$lastpath;
-			echo '<br><b>Device:</b> '.$device;
+			echo '<br><b>Urządzenie:</b> '.$device;
 		}
-		
-		if($otherframefound) 
-		{			
+
+		if($otherframefound)
+		{
 			echo '<br><br><b>Ostatnia ramka statusowa odebrana:</b> '.$otherdate.' '.$othertime.' (';
-			$dc = time() - date('Z') - strtotime($otherdate.' '.$othertime);
+			$dc = time() - strtotime($otherdate.' '.$othertime);
 			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s temu)';
 			echo '<br><b>Status: </b>'.$status;
 		}
-		
 
-	
 	}
 
-} 
+}
 
 
 
