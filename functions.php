@@ -364,7 +364,7 @@ function frameparse($frame)
 				else //if it's a standard frame
 				{
 					$mice = 0;
-					if($dd[7] === 'z') //if the positions contains timestamp
+					if(($dd[7] === 'z')OR($dd[7] === '/')OR($dd[7] === 'h')) //if the positions contains timestamp
 					{
 						$symboltab = $dd[16];
 						$symbol = $dd[26];
