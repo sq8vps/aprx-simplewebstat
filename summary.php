@@ -4,13 +4,12 @@ This file is a part of SIMPLE WEB STATICSTICS GENERATOR FROM APRX LOG FILE
 It's very simple and small APRX statictics generator in PHP. It's parted to smaller files and they will work independent from each other (but you always need chgif.php).
 This script may have a lot of bugs, problems and it's written in very non-efficient way without a lot of good programming rules. But it works for me.
 Author: Peter SQ8VPS, sq8vps[--at--]gmail.com & Alfredo IZ7BOJ
-You can modify this program, but please give a credit to original authors. Program is free for non-commercial use only.
+You can modify this program, but please give a credit to original author. Program is free for non-commercial use only.
 (C) Peter SQ8VPS & Alfredo IZ7BOJ 2017-2018
 
-Version 1.3.1beta
 *******************************************************************************************/
-?>
-<?php
+
+
 include 'config.php';
 include 'common.php';
 include 'functions.php';
@@ -36,6 +35,13 @@ if($lang == "en")
 <meta name="Description" content="APRX statistics" />
 <meta name="Keywords" content="" />
 <meta name="Author" content="SQ8VPS" />
+
+<!-- next style is to show arrows in sortable table's column headers to indicate that the table is sortable -->
+<style type="text/css">
+table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
+	    content: " \25B4\25BE"
+	}
+</style>
 <title>APRX statistics - summary</title>
 </head>
 <body>
@@ -65,6 +71,11 @@ if(file_exists($logourl)){
 <meta name="Description" content="Statystyki APRX" />
 <meta name="Keywords" content="" />
 <meta name="Author" content="SQ8VPS" />
+<style type="text/css">
+table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
+            content: " \25B4\25BE"
+        }
+</style>
 <title>Statystyki APRX - podsumowanie</title>
 </head>
 <body>
@@ -228,20 +239,11 @@ if($lang == "en")
 	echo "<br><b>Number of frames received on radio: </b>".$rx;
 	echo "<br><b>Number of frames transmitted on radio: </b>".$tx;
 	echo "<br><b>Number of frames received from APRS-IS: </b>".$is;
-/*	if($logfile[$lines - 20] > 0)
-	{
-		load($logfile[$lines - 21], 0);
-		load($logfile[$lines - 1], 1);
-		echo "<br><b>Load (last 20 frames): </b>".number_format($framespermin, 2, '.', ',')." frames/min";
-	}
-*/
-rxload();
-echo "<br><b>RX Load (last 20 frames): </b>".number_format($rxframespermin, 2, '.', ',')." frames/min";
-txload();
-echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '.', ',')." frames/min";
+	rxload();
+	echo "<br><b>RX Load (last 20 frames): </b>".number_format($rxframespermin, 2, '.', ',')." frames/min";
+	txload();
+	echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '.', ',')." frames/min";
 	?>
-
-
 <br><br><hr><br>
 
 <!-- <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
@@ -343,14 +345,18 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 	<?php
 	echo "<br><br><b>".count($receivedstations)." Stations received on radio (including $unique[1] unique stations):</b><br><br>";
 	?>
-	<table style="text-align: left; height: 116px; width: 600px;" border="1">
+	<script src="sorttable.js"></script>
+
+	<table style="text-align: left; height: 116px; width: 850px;" border="1" class="sortable" id="table">
 	<tbody>
 	<tr>
-	<td bgcolor="#ffd700"><b><font color="blue">Callsign</font></b></td>
-	<td bgcolor="#ffd700"><b><font color="blue">Points</font></b></td>
+	<th bgcolor="#ffd700"><b><font color="blue">Callsign</font></b></th>
+	<th bgcolor="#ffd700"><b><font color="blue">Points</font></b></th>
 	<td bgcolor="#ffd700"><b><font color="blue">Map show</font></b></td>
         <td bgcolor="#ffd700"><b><font color="blue">Raw packet</font></b></td>
 	<td bgcolor="#ffd700"><b><font color="blue">Details</font></b></td>
+	<th bgcolor="#ffd700"><b><font color="blue">STATIC/Moving</font></b></th>
+	<th bgcolor="#ffd700"><b><font color="blue">Via</font></b></th>
 	</tr>
 	<?php
 	while(list($c, $nm) = each($receivedstations))
@@ -362,6 +368,20 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 		<td><?php echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">Show on aprs.fi</a>'?></td>
 		<td><?php echo '<a target="_blank" href="frames.php?getcall='.$c.'">Show RAW Packets</a>'?></td>
 		<td><?php echo '<a target="_blank" href="details.php?getcall='.$c.'">Show station details</a>' ?></td>
+		<td align="center">
+		<?php
+		if (in_array($c, $staticstations)) echo '<font color="purple">STATIC</font>';
+		elseif (in_array($c, $movingstations)) echo '<font color="orange">MOVING</font>';
+		else echo "OTHER";
+		?>
+		</td>
+		<td align="center">
+                <?php
+           	if ((in_array($c, $directstations))&&(in_array($c, $viastations))) echo '<font color="BLUE">DIGI+DIRECT</font>';
+		elseif (in_array($c, $directstations)) echo '<font color="RED">DIRECT</font>';
+                else if (in_array($c, $viastations)) echo '<font color="GREEN">DIGI</font>';
+                ?>
+                </td>
 	</tr>
 	<?php
 	}
@@ -374,13 +394,11 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 	echo "<br><b>Liczba ramek odebranych przez radio: </b>".$rx;
 	echo "<br><b>Liczba ramek nadanych przez radio: </b>".$tx;
 	echo "<br><b>Liczba ramek odebranych z APRS-IS: </b>".$is;
-	if($logfile[$lines - 20] > 0)
-	{
-		load($logfile[$lines - 21], 0);
-		load($logfile[$lines - 1], 1);
-		echo "<br><b>Obciążenie (ostatenie 20 ramek): </b>".number_format($framespermin, 2, '.', ',')." ramek/min";
-	}
-	?>
+	rxload();
+	echo "<br><b>RX Obciążenie (ostatenie 20 ramek): </b>".number_format($rxframespermin, 2, '.', ',')." ramek/min";
+	txload();
+	echo "<br><b>TX Obciążenie (ostatenie 20 ramek): </b>".number_format($txframespermin, 2, '.', ',')." ramek/min";
+        ?>
 
 <br><br><hr><br>
 
@@ -481,14 +499,17 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 	<?php
 	echo "<br><br><b>".count($receivedstations)." Stacje odebrane przez radio (zawiera $unique[1] unikatowych stacji):</b><br><br>";
 	?>
-	<table style="text-align: left; height: 116px; width: 600px;" border="1">
+        <script src="sorttable.js"></script>
+	<table style="text-align: left; height: 116px; width: 1000px;" border="1" class="sortable" id="table">
 	<tbody>
 	<tr>
-	<td bgcolor="#ffd700"><b><font color="blue">Znak</font></b></td>
-	<td bgcolor="#ffd700"><b><font color="blue">Punkty</font></b></td>
+	<th bgcolor="#ffd700"><b><font color="blue">Znak</font></b></th>
+	<th bgcolor="#ffd700"><b><font color="blue">Punkty</font></b></th>
 	<td bgcolor="#ffd700"><b><font color="blue">Pokaż na mapie</font></b></td>
         <td bgcolor="#ffd700"><b><font color="blue">Surowe pakiety</font></b></td>
 	<td bgcolor="#ffd700"><b><font color="blue">Szczegóły</font></b></td>
+	<th bgcolor="#ffd700"><b><font color="blue">statyczny/w ruchu</font></b></th>
+        <th bgcolor="#ffd700"><b><font color="blue">Via</font></b></th>
 	</tr>
 	<?php
 	while(list($c, $nm) = each($receivedstations))
@@ -500,80 +521,34 @@ echo "<br><b>TX Load (last 20 frames): </b>".number_format($txframespermin, 2, '
 		<td><?php echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">Pokaż na aprs.fi</a>'?></td>
 		<td><?php echo '<a target="_blank" href="frames.php?getcall='.$c.'">Pokaż surowe pakiety</a>'?></td>
 		<td><?php echo '<a target="_blank" href="details.php?getcall='.$c.'">Pokaż szczegółby stacji</a>' ?></td>
+                <td align="center">
+                <?php
+                if (in_array($c, $staticstations)) echo '<font color="purple">statyczny</font>';
+                elseif (in_array($c, $movingstations)) echo '<font color="orange">w ruchu</font>';
+                else echo "inny";
+                ?>
+                </td>
+                <td align="center">
+                <?php
+                if ((in_array($c, $directstations))&&(in_array($c, $viastations))) echo '<font color="BLUE">digi+bezpośredni</font>';
+                elseif (in_array($c, $directstations)) echo '<font color="RED">bezpośredni</font>';
+                else if (in_array($c, $viastations)) echo '<font color="GREEN">digi</font>';
+                ?>
+                </td>
+
 	</tr>
 	<?php
-	}
+	} //close while
 	?>
 	</tbody>
         </table>
-	<?php
-}
-
-asort($movingstations); //sort
-asort($staticstations);
-asort($otherstations);
-asort($viastations);
-asort($directstations);
-
-if($lang == "en")
-{
-	echo "<br><br><hr /><br><font color=\"blue\"><b>Moving stations (<u>".count($movingstations)."</u>):</b></font> ";
-	while(list($u, $o) = each($movingstations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-	echo "<br><br><font color=\"red\"><b>Static stations (<u>".count($staticstations)."</u>):</b></font> ";
-	while(list($u, $o) = each($staticstations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-	echo "<br><br><font color=\"green\"><b>Other stations (<u>".count($otherstations)."</u>):</b></font> ";
-	while(list($u, $o) = each($otherstations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-	echo "<br><br><hr /><br><font color=\"blue\"><b>Stations received indirectly (via digi) (<u>".count($viastations)."</u>):</b></font> ";
-	while(list($u, $o) = each($viastations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-	echo "<br><br><font color=\"red\"><b>Stations received directly (<u>".count($directstations)."</u>):</b></font> ";
-	while(list($u, $o) = each($directstations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-} else {
-	echo "<br><br><hr /><br><font color=\"blue\"><b>Stacje ruchome (<u>".count($movingstations)."</u>):</b></font> ";
-	while(list($u, $o) = each($movingstations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-	echo "<br><br><font color=\"red\"><b>Stacje stałe (<u>".count($staticstations)."</u>):</b></font> ";
-	while(list($u, $o) = each($staticstations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-	echo "<br><br><font color=\"green\"><b>Inne stacje (<u>".count($otherstations)."</u>):</b></font> ";
-	while(list($u, $o) = each($otherstations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-	
-	echo "<br><br><hr /><br><font color=\"blue\"><b>Stacje odebrane pośrednio (przez digi) (<u>".count($viastations)."</u>):</b></font> ";
-	while(list($u, $o) = each($viastations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-	echo "<br><br><font color=\"red\"><b>Stacje odebrane bezpośrednio (<u>".count($directstations)."</u>):</b></font> ";
-	while(list($u, $o) = each($directstations))
-	{
-		echo '<a target="_blank" href="https://aprs.fi/?call='.$o.'">'.$o.'</a>'.", ";
-	}
-}
-
+<?php
+} //close language
 ?>
+
 <br><hr><br>
 <center><a href="https://github.com/sq8vps/aprx-simplewebstat" target="_blank">APRX Simple Webstat version <?php echo $asw_version; ?></a> by Peter SQ8VPS and Alfredo IZ7BOJ</center>
 <br>
 </body>
 </html>
+
