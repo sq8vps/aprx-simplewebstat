@@ -1,5 +1,8 @@
 <?php
 include 'config.php';
+include 'common.php';
+
+logexists();
 
 if (isset($_GET['ajax'])) {
   session_start();

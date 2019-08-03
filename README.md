@@ -51,6 +51,32 @@ That can be a link to an external or local file. The image will be automatically
 
 To set your custom text info place that info in a file named **custom.php**. It can contain HTML and PHP code.
 
+## AX.25 realtime monitor configuration
+
+You can watch the AX.25 traffic in realtime using this software. The default configuration should be sufficient in most cases.
+
+You can set monitor's refresh rate (in ms unit):
+```
+$refresh=2000;
+```
+
+You can change colors:
+```
+$timestampcolor="silver";
+$APRSIScolor="orange";
+$RFcolor="blue";
+$TXcolor="red";
+$RXcolor="green";
+$pathcolor="purple";
+```
+
+Here you set the number of rows displayed at session opening:
+```
+$startrows=5;
+```
+
+
+
 ## Software stability
 
 This is a BETA software. It can contain some bugs and may be written in non-efficient way. Please contact authors if you find any bug.
