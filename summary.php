@@ -56,7 +56,7 @@ if(file_exists($logourl)){
 <h2>for interface <font color="red"><b><?php echo $call; ?></b></font> - summary</h2> <a href="chgif.php?chgif=1">Change interface</a>
 <br>
 <br><b>Show:</b> <a href="summary.php">Summary (main)</a> - <a href="frames.php">RAW frames from specified station</a> - <a href="details.php">Details of a specified station</a><br><br>
-<button onclick="window.open('live.php')">Watch AX25 Realtime traffic !</button>
+<button onclick="window.open('live.php')">Watch AX.25 realtime traffic</button>
 <br><br>
 <hr>
 </center>
@@ -90,6 +90,8 @@ if(file_exists($logourl)){
 <h2>dla interfejsu <font color="red"><b><?php echo $call; ?></b></font> - podsumowanie</h2> <a href="chgif.php?chgif=1">Zmień interfejs</a>
 <br>
 <br><b>Pokaż:</b> <a href="summary.php">Podsumowanie (główna)</a> - <a href="frames.php">Surowe ramki wybranej stacji</a> - <a href="details.php">Szczegóły wybranej stacji</a><br><br>
+<button onclick="window.open('live.php')">Podgląd ruchu AX.25 na żywo</button>
+<br><br>
 <hr>
 </center>
 <br>
@@ -343,7 +345,7 @@ if($lang == "en")
 </select>
 <input type="submit" value="Refresh">
 	<?php
-	echo "<br><br><b>".count($receivedstations)." Stations received on radio (including $unique[1] unique stations):</b><br><br>";
+	echo "<br><br><b>".count($receivedstations)." stations received on radio (including $unique[1] unique stations):</b><br><br>";
 	?>
 	<script src="sorttable.js"></script>
 
@@ -497,7 +499,7 @@ if($lang == "en")
 </select>
 <input type="submit" value="Refresh">
 	<?php
-	echo "<br><br><b>".count($receivedstations)." Stacje odebrane przez radio (zawiera $unique[1] unikatowych stacji):</b><br><br>";
+	echo "<br><br><b>".count($receivedstations)." stacje odebrane przez radio (zawiera $unique[1] unikatowych stacji):</b><br><br>";
 	?>
         <script src="sorttable.js"></script>
 	<table style="text-align: left; height: 116px; width: 1000px;" border="1" class="sortable" id="table">

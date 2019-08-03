@@ -410,8 +410,8 @@ function frameparse($frame)
 				$bearing = round($bearing, 1);
 
 			}
-			else
-//			else if(($dd[0] === ">") or ($dd[0] === "<") or ($dd[0] === "{")) //if it's a status or beacon frame
+//			else
+			else if(($dd[0] === ">") or ($dd[0] === "<") or ($dd[0] === "{")) //if it's a status or beacon frame
 			{
 				if($otherframefound) return; //if we have already status frame parsed, just skip it
 

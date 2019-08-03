@@ -118,7 +118,7 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 	{
 		echo '<b><font color="blue" size="8">'.$scall.'</font></b>';
 		echo '<br><a href="https://aprs.fi/?call='.$scall.'" target="_blank">Show on aprs.fi</a><br><br>';
-		echo '<b>Frames heard:</b><a href="frames.php?getcall='.$_GET['getcall'].'" target="_blank">'.$noofframes.'</a><br>';
+		echo '<b>Frames heard: </b><a href="frames.php?getcall='.$_GET['getcall'].'" target="_blank">'.$noofframes.'</a><br>';
 		if($posframefound)
 		{
 			echo '<br><br><font color="blue"><b>Last position frame heard:</b> '.$posdate.' '.$postime.' GMT (';
@@ -172,7 +172,7 @@ if(file_exists($logourl)){
 </center>
 <br>
 <form action="details.php" method="get">
-Pokaż szczegóły stacji: <input type="text" name="call" <?php if(isset($_GET['call'])) echo 'value="'.$_GET['call'].'"'; ?>>
+Pokaż szczegóły stacji: <input type="text" name="getcall" <?php if(isset($_GET['getcall'])) echo 'value="'.$_GET['getcall'].'"'; ?>>
 <input type="submit" value="Pokaż">
 </form>
 <br>
@@ -187,33 +187,32 @@ if(isset($_GET['getcall']) && ($_GET['getcall'] != ""))
 {
 	if(($posframefound == 0) && ($otherframefound == 0))
 	{
-		echo '<font size="6">Nie znaleziono ramek dla stacji <b>'.$scall.'</b>.</font>';
+		echo '<font size="6">Brak odebranych ramek od stacji <b>'.$scall.'</b>.</font>';
 	}
 	else
 	{
 		echo '<b><font color="blue" size="8">'.$scall.'</font></b>';
 		echo '<br><a href="https://aprs.fi/?call='.$scall.'" target="_blank">Pokaż na aprs.fi</a><br><br>';
-		echo '<b>Ramek odebranych: </b><a href="frames.php?getcall='.$_GET['getcall'].'" target="_blank">'.$noofframes.'</a><br>';
-
+		echo '<b>Frames heard: </b><a href="frames.php?getcall='.$_GET['getcall'].'" target="_blank">'.$noofframes.'</a><br>';
 		if($posframefound)
 		{
-			echo '<br><br><font color="blue"><b>Ostatnia ramka pozycyjna odebrana:</b> '.$posdate.' '.$postime.' GMT (';
-			$dc = time() - date('Z') - strtotime($posdate.' '.$postime);
-			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s temu)</font>';
-			echo '<br><font color="red"><b>Pozycja stacji: </b>'.$declat.', '.$declon.' - <b>'.$distance.' km '.$bearing.'° od twojej lokalizacji</b></font>';
+			echo '<br><br><font color="blue"><b>Ostatnia ramka z pozycją:</b> '.$posdate.' '.$postime.' GMT (';
+			$dc = time() -date('Z') - strtotime($posdate.' '.$postime);
+			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s ago)</font>';
+			echo '<br><font color="red"><b>Pozycja: </b>'.$declat.', '.$declon.' - <b>'.$distance.' km '.$bearing.'° od twojej lokalizacji</b></font>';
 			echo '<br><font color="green"><b>Komentarz: </b>'.$comment.'</font>';
 			echo '<br><br><b>Typ ramki:</b> ';
 			if($mice) echo 'Ramka skompresowana Mic-E'; else echo 'Ramka nieskompresowana';
-			echo '<br><b>Symbol stacji:</b> '.$symboltab.$symbol;
-			echo '<br><b>Ścieżka ramki:</b> '.$scall.'>'.$lastpath;
+			echo '<br><b>Symbol:</b> '.$symboltab.$symbol;
+			echo '<br><b>Ścieżka:</b> '.$scall.'>'.$lastpath;
 			echo '<br><b>Urządzenie:</b> '.$device;
 		}
 
 		if($otherframefound)
 		{
-			echo '<br><br><b>Ostatnia ramka statusowa odebrana:</b> '.$otherdate.' '.$othertime.' (';
+			echo '<br><br><b>Ostatnia ramka statusu:</b> '.$otherdate.' '.$othertime.' (';
 			$dc = time() - strtotime($otherdate.' '.$othertime);
-			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s temu)';
+			echo (int)($dc / 86400).'d '.(int)(($dc % 86400) / 3600).'h '.(int)(($dc % 3600) / 60).'m '.(int)($dc % 60).'s ago)';
 			echo '<br><b>Status: </b>'.$status;
 		}
 

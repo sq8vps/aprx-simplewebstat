@@ -1,15 +1,5 @@
 <?php
-/***CONFIGURATION SECTION***/
-$refresh=1000; //refresh time in ms. Don't go below 1000
-$logpath="/var/log/aprx/aprx-rf.log"; // log file complete path
-$timestampcolor="silver"; //color of timestamp
-$APRSIScolor="orange"; // color of APRSIS interface
-$RFcolor="blue"; // color of RF interface
-$TXcolor="red"; //color of TX indicator
-$RXcolor="green"; // color of RX indicator
-$pathcolor="purple"; // color of path string
-$startrows=5; //number of last rows displayed at session opening
-/**** END OF CONFIGURATION***/
+include 'config.php';
 
 if (isset($_GET['ajax'])) {
   session_start();

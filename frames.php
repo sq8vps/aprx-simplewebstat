@@ -28,6 +28,8 @@ $callraw = $_SESSION['if'];
 $lang = $_SESSION['lang'];
 $frames = array();
 
+
+
 if(isset($_GET['getcall']) and ($_GET['getcall'] !== ""))
 {
         global $logpath;
@@ -63,7 +65,7 @@ if(isset($_GET['getcall']) and ($_GET['getcall'] !== ""))
                 }
                 $b++;
         }//close while
-
+}
 if($lang == "en")
 {
 ?>
@@ -96,12 +98,15 @@ if(file_exists($logourl)){
         <input type="submit" value="Show">
 </form>
 <?php
+if(isset($_GET['getcall']) and ($_GET['getcall'] !== ""))
+{
         echo "<font color=\"red\"><b>Found ".count($frames)." frames from station $scall</b></font><br><br>";
         array_multisort($frames, SORT_DESC);
         for($o = 0; $o < count($frames); $o++)
         {
                 echo $frames[$o]."<br>";
         }
+}
 }//close if english
 else {
 ?>
@@ -135,7 +140,9 @@ if(file_exists($logourl)){
 </form>
 
 <?php
-        echo "<font color=\"red\"><b>Znaleziono ".count($frames)." ramek od stacji $scall</b></font><br><br>";
+if(isset($_GET['getcall']) and ($_GET['getcall'] !== ""))
+{ 
+ echo "<font color=\"red\"><b>Znaleziono ".count($frames)." ramek od stacji $scall </b></font><br><br>";
         array_multisort($frames, SORT_DESC);
         for($o = 0; $o < count($frames); $o++)
         {

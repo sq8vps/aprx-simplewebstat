@@ -19,4 +19,14 @@ $stationlon = 16.421246;  //station longtitude in decimal degrees
 
 //logo path,with file name
 $logourl="aprslogo.png";
+
+//AX.25 realtime traffic watch config
+$refresh=1000; //refresh time in ms. Don't go below 1000
+$timestampcolor="silver"; //color of timestamp
+$APRSIScolor="orange"; //color of APRSIS interface
+$RFcolor="blue"; //color of RF interface
+$TXcolor="red"; //color of TX indicator
+$RXcolor="green"; //color of RX indicator
+$pathcolor="purple"; //color of path string
+$startrows=5; //number of last rows displayed at session opening
 ?>
