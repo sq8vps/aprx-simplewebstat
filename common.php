@@ -1,5 +1,5 @@
 <?php
-$asw_version = "1.3.0beta";
+$asw_version = "1.3.1beta";
 include 'config.php';
 
 function logexists()
