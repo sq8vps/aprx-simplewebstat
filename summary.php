@@ -153,13 +153,23 @@ while ($lines < $linesinlog) { //read line by line
 	}
 		$lines++;
 }
+//unique counters doesn't work with multidimensional array
+//$unique = array_count_values($receivedstations);
+//if(empty($unique[1]))
+//{
+//	$unique[1] = 0;
+//}
+//array_multisort($receivedstations, SORT_DESC);
 
-$unique = array_count_values($receivedstations);
-if(empty($unique[1]))
-{
-	$unique[1] = 0;
+// custom sorting function
+function cmp($a, $b) {
+    if ($a[1] == $b[1]) {
+        return 0;
+    }
+    return ($a[1] > $b[1]) ? -1 : 1;
 }
-array_multisort($receivedstations, SORT_DESC);
+											  
+uasort($receivedstations, 'cmp');
 
 // System parameters reading
 $sysver = NULL;
@@ -345,11 +355,12 @@ if($lang == "en")
 </select>
 <input type="submit" value="Refresh">
 	<?php
-	echo "<br><br><b>".count($receivedstations)." stations received on radio (including $unique[1] unique stations):</b><br><br>";
+	//echo "<br><br><b>".count($receivedstations)." stations received on radio (including $unique[1] unique stations):</b><br><br>";
+	echo "<br><br><b>".count($receivedstations)." Stations received on radio (sorted by Last Time Heard)</b><br><br>";
 	?>
 	<script src="sorttable.js"></script>
 
-	<table style="text-align: left; height: 116px; width: 850px;" border="1" class="sortable" id="table">
+	<table style="text-align: left; height: 116px; width: 1000px;" border="1" class="sortable" id="table">
 	<tbody>
 	<tr>
 	<th bgcolor="#ffd700"><b><font color="blue">Callsign</font></b></th>
@@ -359,6 +370,7 @@ if($lang == "en")
 	<td bgcolor="#ffd700"><b><font color="blue">Details</font></b></td>
 	<th bgcolor="#ffd700"><b><font color="blue">STATIC/Moving</font></b></th>
 	<th bgcolor="#ffd700"><b><font color="blue">Via</font></b></th>
+	<th bgcolor="#ffd700"><b><font color="blue">Last time Heard</font></b></th>
 	</tr>
 	<?php
 	while(list($c, $nm) = each($receivedstations))
@@ -366,7 +378,7 @@ if($lang == "en")
 	?>
 	<tr>
 		<td bgcolor="silver"><b><?php echo $c ?></b></td>
-		<td align="center"><?php echo $nm ?></td>
+		<td align="center"><?php echo $nm[0] ?></td>
 		<td><?php echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">Show on aprs.fi</a>'?></td>
 		<td><?php echo '<a target="_blank" href="frames.php?getcall='.$c.'">Show RAW Packets</a>'?></td>
 		<td><?php echo '<a target="_blank" href="details.php?getcall='.$c.'">Show station details</a>' ?></td>
@@ -384,6 +396,11 @@ if($lang == "en")
                 else if (in_array($c, $viastations)) echo '<font color="GREEN">DIGI</font>';
                 ?>
                 </td>
+		<td>
+		<?php
+		echo(date('m/d/Y H:i:s', $nm[1]))
+		?>
+		</td>
 	</tr>
 	<?php
 	}
@@ -502,7 +519,7 @@ if($lang == "en")
 	echo "<br><br><b>".count($receivedstations)." stacje odebrane przez radio (zawiera $unique[1] unikatowych stacji):</b><br><br>";
 	?>
         <script src="sorttable.js"></script>
-	<table style="text-align: left; height: 116px; width: 1000px;" border="1" class="sortable" id="table">
+	<table style="text-align: left; height: 116px; width: 1100px;" border="1" class="sortable" id="table">
 	<tbody>
 	<tr>
 	<th bgcolor="#ffd700"><b><font color="blue">Znak</font></b></th>
@@ -512,6 +529,7 @@ if($lang == "en")
 	<td bgcolor="#ffd700"><b><font color="blue">Szczegóły</font></b></td>
 	<th bgcolor="#ffd700"><b><font color="blue">statyczny/w ruchu</font></b></th>
         <th bgcolor="#ffd700"><b><font color="blue">Via</font></b></th>
+	<th bgcolor="#ffd700"><b><font color="blue">Ostatni raz słyszałem</font></b></th>
 	</tr>
 	<?php
 	while(list($c, $nm) = each($receivedstations))
@@ -519,7 +537,7 @@ if($lang == "en")
 	?>
 	<tr>
 		<td bgcolor="silver"><b><?php echo $c ?></b></td>
-		<td align="center"><?php echo $nm ?></td>
+		<td align="center"><?php echo $nm[0] ?></td>
 		<td><?php echo '<a target="_blank" href="https://aprs.fi/?call='.$c.'">Pokaż na aprs.fi</a>'?></td>
 		<td><?php echo '<a target="_blank" href="frames.php?getcall='.$c.'">Pokaż surowe pakiety</a>'?></td>
 		<td><?php echo '<a target="_blank" href="details.php?getcall='.$c.'">Pokaż szczegółby stacji</a>' ?></td>
@@ -537,7 +555,11 @@ if($lang == "en")
                 else if (in_array($c, $viastations)) echo '<font color="GREEN">digi</font>';
                 ?>
                 </td>
-
+		<td>
+                <?php
+                echo(date('m/d/Y H:i:s', $nm[1]))
+                ?>
+                </td>
 	</tr>
 	<?php
 	} //close while
