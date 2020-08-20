@@ -40,12 +40,12 @@ function stationparse($frame) //function for parsing station information
 
 			if(array_key_exists($stationcall, $receivedstations)) //if this callsign is already on stations list
 			{
-				$receivedstations[$stationcall]++; //increment the number of frames from this station
+				$receivedstations[$stationcall][0]++; //increment the number of frames from this station
 			} else //if this callsign is not on the list
 			{
-				$receivedstations[$stationcall] = 1; //add callsign to the list
+				$receivedstations[$stationcall][0] = 1; //add callsign to the list
 			}
-
+			$receivedstations[$stationcall][1] = $uu; //add last time
 			$bb = substr($frame, 46); //let's cut temporarily some part of a frame to make sure, that there is no : character, because we want it only as a separator between frame path and info field
 			//------DEBUG-----^^^^^^ this can make some problems, beacuse it's very primitive
 			$bb = substr($bb, strpos($bb, ":") + 1); //get whole date from the frame after a : character, to get info field
