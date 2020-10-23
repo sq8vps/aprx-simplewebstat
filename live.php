@@ -45,18 +45,18 @@ function color($row) {
 	global $pathcolor;
 
 	$timestamp=substr($row, 0, 24);  //take only the part of the line, where date and time is
-  $int=substr($row,24,10); //cut interface
-  $txrx=substr($row,34,2);// cut rx-tx indicator
+  	$int=substr($row,24,10); //cut interface
+  	$txrx=substr($row,34,2);// cut rx-tx indicator
 	$body=explode(":",substr($row,36),2);
 	$path=$body[0];
 	$comment=$body[1];
 
-  $timestampc="<span style='color:".$timestampcolor."'>".$timestamp."</span>";
-  if (strpos($int,"APRSIS")!==false) {
-		$int="<span style='color:".$APRSIScolor."'>".$int."&nbsp</span>";
+  	$timestampc="<span style='color:".$timestampcolor."'>".$timestamp."</span>";
+  	if (strpos($int,"APRSIS")!==false) {
+		$intc="<span style='color:".$APRSIScolor."'>".$int.str_repeat("&nbsp",3)."</span>";
 		}
-  else {
-		$int="<span style='color:".$RFcolor."'>RADIO".str_repeat("&nbsp",3)."</span>";
+  	else {
+		$intc="<span style='color:".$RFcolor."'>".$int.str_repeat("&nbsp",9 - strlen($int))."</span>";
 		}
 	if (strpos($txrx,"T")!==false) {
 		$txrx="<span style='color:".$TXcolor."'>TX"."&nbsp</span>";
@@ -65,7 +65,13 @@ function color($row) {
 		$txrx="<span style='color:".$RXcolor."'>RX"."&nbsp </span>";
 		}
 	$path="<span style='color:".$pathcolor."'>".$path."</span>";
-	$rowc=$timestampc." ".$int." ".$txrx." ".$path.":".$comment."<br>";
+	
+        if ((strpos($int,$_SESSION['if'])!==false) or (strpos($int,"APRSIS")!==false))  {
+	        $rowc=$timestampc." ".$intc." ".$txrx." ".$path.":".$comment."<br>";
+        	}
+	else {
+		$rowc=""; //don't print traffic from other radio interfaces than the selected
+		}
 } //close function
 
 ?>
@@ -84,6 +90,6 @@ function color($row) {
   });
   </script> </head> <body>
   <div id="tail"><i>Real time traffic monitor - Starting up...</i><br><br>
-<b>TIMESTAMP<?php echo str_repeat("&nbsp",17) ?>INTERF <?php echo str_repeat("&nbsp",1) ?>R/T<?php echo str_repeat("&nbsp",2)?>PATH:BODY</b>
+<b>TIMESTAMP<?php echo str_repeat("&nbsp",17) ?>INTERF <?php echo str_repeat("&nbsp",3) ?>R/T<?php echo str_repeat("&nbsp",2)?>PATH:BODY</b>
 <br></div> </body>
 </html>
