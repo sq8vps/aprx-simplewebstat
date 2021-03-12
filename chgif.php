@@ -19,10 +19,14 @@ Version 1.2.1beta
 <title>APRX statistics</title>
 </head>
 <body>
+<center><font size="20"><b>WELCOME to APRX statistics!</b></font>
+<h2>Please select interface and language before proceeding</h2> 
+<br><br><br>
+</center>
 <?php
 include 'config.php';
 include 'common.php';
-
+$i=0;
 logexists();
 
 $callsign;
@@ -35,16 +39,24 @@ if((((!isset($_SESSION['if'])) or (isset($_SESSION['if']) and ($_SESSION['if'] =
 	session_start();
 ?>
 <form action="chgif.php" method="get">
-Interface callsign: <input type="text" name="call">
-<br>"APRSIS" is NOT valid interface callsign, it will cause problems.<br>
+Interface: <select name="call">
+<?php
+for ($i=0;$i<=sizeof($interfaces)-1;$i++) {
+?>
+	<option value=<?php echo $interfaces[$i] ?>><?php echo $interfaces[$i]." - ".$intdesc[$i] ?></option>
+<?php
+}
+?>
+</select>
+<br><br><br><br><br>
 Language: <select name="lang">
 <option>English</option>
 <option>Polski</option>
 </select>
-<br>
+<br><br><br><br><br>
 <input type="submit" value="OK">
 </form>
-<br><b>If you don't want to see this page, you can set static interface callsign in config.php</b><br>
+
 <?php
 } else {
 	if(!isset($_SESSION['if'])) //if there is now "if" variable
