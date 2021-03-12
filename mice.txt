@@ -2,10 +2,19 @@ _  Yaesu VX-8
 _" Yaesu FTM-350
 _# Yaesu VX-8G
 _$ Yaesu FT1D
-_( Yaesu FT2D
-_) Yaesu FTM-100D
 _% Yaesu FTM-400DR
+_) Yaesu FTM-100D
+_( Yaesu FT2D
+_0 Yaesu FT3D
+_1 Yaesu FTM-300D
+ X AP510 KD7LXL
+(5 Anytone D578UV
+(8  Anytone D878UV
 |3 Byonics TinyTrak3
 |4 Byonics TinyTrak4
+\v  Hamhud
+/v  Argent
 ^v HinzTec anyfrog
 *v KissOZ Tracker
+:4 SCS GmbH & Co. P4dragon DR-7400 modems
+:8 SCS GmbH & Co. P4dragon DR-7800 modems
