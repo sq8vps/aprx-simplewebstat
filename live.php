@@ -79,7 +79,7 @@ function color($row) {
 <!doctype html> <html lang="en"> <head>
   <meta charset="UTF-8">
   <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-  <script src="http://creativecouple.github.com/jquery-timing/jquery-timing.min.js"></script>
+  <script src="http://creativecouple.github.io/jquery-timing/jquery-timing.min.js"></script>
   <script>
   $(function() {
     $.repeat(<?php echo $refresh ?>, function() {
