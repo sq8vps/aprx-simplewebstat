@@ -34,7 +34,7 @@ function stationparse($frame) //function for parsing station information
 				$stationcall = substr($aa[0], strpos($aa[0], $callraw." R ") + strlen($callraw." R ")); //remove date and time, interface call up to the received station's call, so that we get only station's call
 				}
 			if(strpos($aa[0]," d ")) { //if it's a "d" frame
-				if(strpos($aa[0]," d "))
+				if(strpos($aa[0]," d *"))
 					{
                                         $stationcall = substr($aa[0], strpos($aa[0], $callraw." d *") + strlen($callraw." d *")); //remove date and time, interface call up to the received $
                                      	}
