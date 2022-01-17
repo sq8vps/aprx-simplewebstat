@@ -354,6 +354,7 @@ if($lang == "en")
 	<option value="e" <?php if(isset($_GET['time'])&&($_GET['time'] == 'e')) echo 'selected="selected"'?>>all</option>
 </select>
 <input type="submit" value="Refresh">
+	</form>
 	<?php
 	//echo "<br><br><b>".count($receivedstations)." stations received on radio (including $unique[1] unique stations):</b><br><br>";
 	echo "<br><br><b>".count($receivedstations)." Stations received on radio (sorted by Last Time Heard)</b><br><br>";
@@ -515,6 +516,7 @@ if($lang == "en")
 	<option value="e" <?php if(isset($_GET['time'])&&($_GET['time'] == 'e')) echo 'selected=\"selected\"'?>>wszystkie</option>
 </select>
 <input type="submit" value="Refresh">
+	</form>
 	<?php
 	echo "<br><br><b>".count($receivedstations)." stacje odebrane przez radio (zawiera $unique[1] unikatowych stacji):</b><br><br>";
 	?>
