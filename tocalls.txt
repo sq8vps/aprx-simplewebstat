@@ -11,7 +11,8 @@
       APAHxx  AHub
       APAND1  APRSdroid (pre-release) http://aprsdroid.org/
       APAMxx  Altus Metrum GPS trackers
-      APATxx  for Anytone. 81 for 878 HT 
+      APATAR  ATA-R APRS Digipeater by TA7W/OH2UDS and TA6AEU
+      APAT8x  for Anytone. 81 for 878 HT 
       APAT51  for Anytone AT-D578UV APRS mobile radio 
       APAVT5  SainSonic AP510 which is a 1watt tracker
       APAWxx  AGWPE 
@@ -31,7 +32,9 @@
       APCLEZ  Telit EZ10 GSM application ZS6CEY
       APCLUB  Brazil APRS network
       APCLWX  EYWeather GPRS/GSM WX station by ZS6EY
+      APCNxx  for carNET by DG5OAW
       APCSMS  for Cosmos (used for sending commands @USNA)
+      APCSS   for AMSAT cubesats https://cubesatsim.org
       APCWP8  John GM7HHB, WinphoneAPRS
       APCYxx  Cybiko applications
  APD  APD4xx  UP4DAR platform
@@ -54,6 +57,7 @@
       APDVxx  OE6PLD's SSTV with APRS status exchange
       APDWxx  DireWolf, WB2OSZ
  APE  APExxx  Telemetry devices
+      APE2Ax  VA3NNW's Email-2-APRS ap
       APECAN  Pecan Pico APRS Balloon Tracker
       APELKx  WB8ELK balloons
       APERXQ  Experimental tracker by PE1RXQ
@@ -73,7 +77,18 @@
       APHBLx  for DMR Gateway by Eric - KF7EEL
       APHTxx  HMTracker by IU0AAC 
       APHWxx  for use in "HamWAN
- API  APICQx  for ICQ
+ API  API282  for ICOM IC-2820
+      API31   for ICOM ID-31
+      API410  for ICOM ID-4100
+      API51   for ICOM ID-51
+      API510  for ICOM ID-5100
+      API710  for ICOM IC-7100
+      API80   for ICOM IC-80
+      API880  for ICOM ID-880
+      API910  for ICOM IC-9100
+      API92   for ICOM IC-92      
+      API970  for ICOM 9700
+      APICQx  for ICQ
       APICxx  HA9MCQ's Pic IGate
       APIExx  W7KMV's PiAPRS system
       APINxx  PinPoint by AB0WV
@@ -90,17 +105,22 @@
       APK1xx  Kenwood D700's
       APK102  Kenwood D710
       APKRAM  KRAMstuff.com - Mark. G7LEU
- APL  APLGxx  LoRa Gateway/Digipeater OE5BPA
+ APL  APLCxx  APRScube by DL3DCW
+      APLGxx  LoRa Gateway/Digipeater OE5BPA
       APLIGx  LightAPRS - TA2MUN and TA9OHC
+      APLOxx  LoRa KISS TNC/Tracker
       APLQRU  Charlie - QRU Server
       APLMxx  WA0TQG transceiver controller
+      APLSxx  SARIMESH  ( http://www.sarimesh.net ) 
       APLTxx  LoRa Tracker - OE5BPA
  APM  APMxxx  MacAPRS, 
       APMGxx  PiCrumbs and MiniGate - Alex, AB0TJ
       APMIxx  SQ3PLX http://microsat.com.pl/
+      APMPAD  DF1JSL's WXBot clone and extension
       APMQxx  Ham Radio of Things WB2OSZ
       APMTxx  LZ1PPL for tracker
  APN  APNxxx  Network nodes, digis, etc
+      APN2xx  NOSaprs for JNOS 2.0 - VE4KLM
       APN3xx  Kantronics KPC-3 rom versions
       APN9xx  Kantronics KPC-9612 Roms
       APNAxx  WB6ZSU's APRServe
@@ -177,10 +197,12 @@
       APU3xx  UIview terminal program
       APUDRx  NW Digital Radio's UDR (APRS/Dstar)
  APV  APVxxx  Voice over Internet  applications
+      APVMxx  DRCC-DVM Digital Voice (Digital Radio China Club)
       APVRxx  for IRLP
       APVLxx  for I-LINK
       APVExx  for ECHO link
  APW  APWxxx  WinAPRS, etc
+      APW9xx  9A9Y Weather Tracker
       APWAxx  APRSISCE Android version
       APWSxx  DF4IAN's WS2300 WX station
       APWMxx  APRSISCE KJ4ERJ
@@ -192,11 +214,13 @@
       APY01D  Yaesu FT1D series
       APY02D  Yaesu FT2D series
       APY03D  Yaesu FT3D series
+      APY05D  Yaesu FT5D series
       APY100  Yaesu FTM-100D series
       APY300  Yaesu FTM-300D series
       APY350  Yaesu FTM-350  series
       APY400  Yaesu FTM-400D series
  APZ  APZxxx  Experimental
+      APZ200  old versions of JNOS 
       APZ247  for UPRS NR0Q
       APZ0xx  Xastir (old versions. See APX)
       APZMAJ  Martyn M1MAJ DeLorme inReach Tracker
