@@ -54,13 +54,24 @@ if(isset($_GET['getcall']) and ($_GET['getcall'] !== ""))
                         }
                 }
 
-                if(strpos($line, $callraw." d "))
+                elseif(strpos($line, $callraw." d *"))
                 {
                         $statcall = explode(">", $line);
                         $statcall = substr($statcall[0], strpos($statcall[0], $callraw." d *") + strlen($callraw." d *"));
                         if($statcall == $scall)
                         {
                                 $frames[] = str_replace($callraw." d *", "&nbsp;&nbsp;&nbsp;", $line);
+                        }
+                }
+                elseif(strpos($line, $callraw." d "))
+                {
+                        $statcall = explode(">", $line);
+                        //echo $statcall[0];
+                        $statcall = substr($statcall[0], strpos($statcall[0], $callraw." d ") + strlen($callraw." d "));
+                        //echo $statcall.'<br>';
+                        if($statcall == $scall)
+                        {
+                                $frames[] = str_replace($callraw." d ", "&nbsp;&nbsp;&nbsp;", $line);
                         }
                 }
                 $b++;
