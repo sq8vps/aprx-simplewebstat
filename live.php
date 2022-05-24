@@ -56,7 +56,7 @@ function color($row) {
 		$intc="<span style='color:".$APRSIScolor."'>".$int.str_repeat("&nbsp",3)."</span>";
 		}
   	else {
-		$intc="<span style='color:".$RFcolor."'>".$int.str_repeat("&nbsp",9 - strlen($int))."</span>";
+		$intc="<span style='color:".$RFcolor."'>".$int.str_repeat("&nbsp",10 - strlen($int))."</span>";
 		}
 	if (strpos($txrx,"T")!==false) {
 		$txrx="<span style='color:".$TXcolor."'>TX"."&nbsp</span>";
